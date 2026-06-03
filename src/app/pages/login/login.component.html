@@ -1,0 +1,12 @@
+<div class="authbox">
+  <h1>Đăng nhập quản trị</h1>
+  <div class="err" *ngIf="error">{{ error }}</div>
+  <label>Email</label>
+  <input type="email" [(ngModel)]="email" name="email" />
+  <label>Mật khẩu</label>
+  <input type="password" [(ngModel)]="password" name="password" (keyup.enter)="submit()" />
+  <button class="btn" (click)="submit()" [disabled]="loading">
+    {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+  </button>
+  <p class="muted">Dùng tài khoản admin (VD: admin@dididi.local / Admin&#64;123).</p>
+</div>

@@ -1,0 +1,32 @@
+:root{ --brand:#d6006e; --brand-dark:#a80457; --ink:#1f2430; --muted:#6b7280; --line:#e7e9ee; --bg:#f6f7f9; --danger:#c0392b; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg); }
+a{ color:var(--brand); text-decoration:none; }
+.topnav{ display:flex; align-items:center; gap:18px; background:#fff; border-bottom:1px solid var(--line); padding:12px 24px; }
+.topnav .brand{ font-weight:800; font-size:18px; color:var(--brand); }
+.topnav nav a{ color:var(--ink); font-weight:500; }
+.topnav nav a.active{ color:var(--brand); }
+.topnav .sp{ flex:1; }
+.topnav .user{ color:var(--muted); font-size:14px; display:flex; align-items:center; gap:10px; }
+.content{ max-width:980px; margin:24px auto; padding:0 16px; }
+.page-head{ display:flex; align-items:center; justify-content:space-between; }
+.btn{ background:var(--brand); color:#fff; border:0; padding:9px 16px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
+.btn:hover{ background:var(--brand-dark); }
+.btn.ghost{ background:#fff; color:var(--brand); border:1px solid var(--brand); }
+.btn.danger{ background:#fff; color:var(--danger); border:1px solid var(--danger); }
+.btn:disabled{ opacity:.6; cursor:default; }
+.tbl{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-top:14px; }
+.tbl th,.tbl td{ text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); font-size:14px; }
+.tbl th{ background:#fafbfc; color:var(--muted); font-weight:600; }
+.tbl .actions{ display:flex; gap:8px; }
+.muted{ color:var(--muted); font-size:14px; }
+.err{ background:#fbe6e3; color:var(--danger); padding:10px 14px; border-radius:8px; margin:10px 0; font-size:14px; }
+.authbox{ max-width:380px; margin:48px auto; background:#fff; border:1px solid var(--line); border-radius:14px; padding:28px; }
+.authbox h1{ font-size:20px; margin:0 0 14px; }
+.authbox label,.form label{ display:block; font-size:13px; color:var(--muted); margin:12px 0 4px; }
+.authbox input,.form input,.form textarea{ width:100%; padding:10px; border:1px solid #cdd3dd; border-radius:9px; font-size:14px; }
+.authbox .btn{ width:100%; margin-top:18px; }
+.form{ max-width:520px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px; margin-top:14px; }
+.form .chk{ display:flex; align-items:center; gap:8px; margin-top:14px; }
+.form .chk input{ width:auto; }
+.form-actions{ display:flex; gap:10px; margin-top:18px; }

@@ -1,0 +1,27 @@
+<div class="page-head">
+  <h1>Khách sạn</h1>
+  <button class="btn" (click)="add()">+ Thêm khách sạn</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead>
+    <tr><th>ID</th><th>Tên</th><th>Thành phố</th><th>Hạng</th><th>Giá từ</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let h of hotels">
+      <td>{{ h.id }}</td>
+      <td>{{ h.name }}</td>
+      <td>{{ h.city }}</td>
+      <td>{{ h.starRating }}</td>
+      <td>{{ h.minPrice }} {{ h.currency }}</td>
+      <td class="actions">
+        <button class="btn ghost" (click)="edit(h)">Sửa</button>
+        <button class="btn danger" (click)="remove(h)">Xoá</button>
+      </td>
+    </tr>
+    <tr *ngIf="hotels.length === 0"><td colspan="6" class="muted">Chưa có khách sạn.</td></tr>
+  </tbody>
+</table>

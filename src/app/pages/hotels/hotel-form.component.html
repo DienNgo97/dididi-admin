@@ -1,0 +1,21 @@
+<h1>{{ id ? 'Sửa khách sạn' : 'Thêm khách sạn' }}</h1>
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="form">
+  <label>Tên *</label>
+  <input type="text" [(ngModel)]="model.name" name="name" />
+  <label>Thành phố</label>
+  <input type="text" [(ngModel)]="model.city" name="city" />
+  <label>Địa chỉ</label>
+  <input type="text" [(ngModel)]="model.address" name="address" />
+  <label>Mô tả</label>
+  <textarea [(ngModel)]="model.description" name="description" rows="3"></textarea>
+  <label>Hạng sao (1-5)</label>
+  <input type="number" min="1" max="5" [(ngModel)]="model.starRating" name="starRating" />
+  <label class="chk"><input type="checkbox" [(ngModel)]="model.active" name="active" /> Đang hoạt động</label>
+
+  <div class="form-actions">
+    <button class="btn" (click)="save()" [disabled]="saving">{{ saving ? 'Đang lưu...' : 'Lưu' }}</button>
+    <button class="btn ghost" (click)="cancel()">Huỷ</button>
+  </div>
+</div>
