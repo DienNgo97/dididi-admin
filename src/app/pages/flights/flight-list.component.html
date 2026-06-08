@@ -1,0 +1,29 @@
+<div class="page-head"><h1>Chuyến bay</h1></div>
+<p class="muted">Danh sách đồng bộ từ flight-provider (chỉ xem).</p>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading && data">
+  <thead>
+    <tr><th>Số hiệu</th><th>Hãng</th><th>Chặng</th><th>Khởi hành</th><th>Đến</th><th>Giá</th><th>Ghế trống</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let f of data.content">
+      <td>{{ f.flightNumber }}</td>
+      <td>{{ f.airlineCode }}</td>
+      <td>{{ f.from }} → {{ f.to }}</td>
+      <td>{{ f.departureTime | date:'dd/MM HH:mm' }}</td>
+      <td>{{ f.arrivalTime | date:'dd/MM HH:mm' }}</td>
+      <td>{{ f.price | number }} {{ f.currency }}</td>
+      <td>{{ f.availableSeats }}</td>
+    </tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="7" class="muted">Không có chuyến bay.</td></tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="data">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} chuyến</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>

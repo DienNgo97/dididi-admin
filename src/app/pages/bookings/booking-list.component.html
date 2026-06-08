@@ -1,0 +1,38 @@
+<div class="page-head"><h1>Đơn đặt</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters">
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option *ngFor="let s of statuses" [value]="s">{{ s || 'Tất cả' }}</option>
+  </select>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading && data">
+  <thead>
+    <tr><th>Mã</th><th>User</th><th>Loại</th><th>Tiêu đề</th><th>Số tiền</th><th>Trạng thái</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let b of data.content">
+      <td>{{ b.publicCode }}</td>
+      <td>{{ b.userId }}</td>
+      <td>{{ b.type }}</td>
+      <td>{{ b.title }}</td>
+      <td>{{ b.amount | number }} {{ b.currency }}</td>
+      <td><span [ngClass]="'badge ' + (b.status | lowercase)">{{ b.status }}</span></td>
+      <td class="actions">
+        <button class="btn danger" *ngIf="b.status !== 'CANCELLED'" (click)="cancel(b)">Huỷ</button>
+      </td>
+    </tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="7" class="muted">Không có đơn.</td></tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="data">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} đơn</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>

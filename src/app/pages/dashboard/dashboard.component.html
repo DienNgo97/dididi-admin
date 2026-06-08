@@ -1,0 +1,39 @@
+<div class="page-head"><h1>Tổng quan</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<ng-container *ngIf="stats as s">
+  <div class="cards">
+    <div class="card"><div class="k">Người dùng</div><div class="v">{{ s.totalUsers }}</div></div>
+    <div class="card"><div class="k">Khách sạn</div><div class="v">{{ s.totalHotels }}</div></div>
+    <div class="card"><div class="k">Chuyến bay</div><div class="v">{{ s.totalFlights }}</div></div>
+    <div class="card"><div class="k">Đơn đặt</div><div class="v">{{ s.totalBookings }}</div></div>
+    <div class="card brand"><div class="k">Doanh thu (đã xác nhận)</div><div class="v">{{ s.totalRevenue | number }} ₫</div></div>
+  </div>
+
+  <div class="section-title">Đơn theo trạng thái</div>
+  <div class="cards">
+    <div class="card"><div class="k">Chờ thanh toán</div><div class="v">{{ s.bookingsPendingPayment }}</div></div>
+    <div class="card"><div class="k">Đã xác nhận</div><div class="v">{{ s.bookingsConfirmed }}</div></div>
+    <div class="card"><div class="k">Đã huỷ</div><div class="v">{{ s.bookingsCancelled }}</div></div>
+    <div class="card"><div class="k">Thất bại</div><div class="v">{{ s.bookingsFailed }}</div></div>
+  </div>
+
+  <div class="section-title">Đơn gần đây</div>
+  <table class="tbl">
+    <thead>
+      <tr><th>Mã</th><th>Loại</th><th>Tiêu đề</th><th>Số tiền</th><th>Trạng thái</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let b of s.recentBookings">
+        <td>{{ b.publicCode }}</td>
+        <td>{{ b.type }}</td>
+        <td>{{ b.title }}</td>
+        <td>{{ b.amount | number }} {{ b.currency }}</td>
+        <td><span [ngClass]="'badge ' + (b.status | lowercase)">{{ b.status }}</span></td>
+      </tr>
+      <tr *ngIf="s.recentBookings.length === 0"><td colspan="5" class="muted">Chưa có đơn nào.</td></tr>
+    </tbody>
+  </table>
+</ng-container>

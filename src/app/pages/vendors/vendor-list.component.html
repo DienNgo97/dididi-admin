@@ -1,0 +1,51 @@
+<div class="page-head">
+  <h1>Vendors</h1>
+  <button class="btn" (click)="newVendor()">+ Tạo vendor</button>
+</div>
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters">
+  <label class="muted">
+    <input type="checkbox" [ngModel]="onlyPending" (ngModelChange)="onlyPending = $event; load()"/> Chỉ hiện đang chờ duyệt
+  </label>
+</div>
+
+<div class="form" *ngIf="showForm">
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px"><label>Email</label><input type="email" [(ngModel)]="form.email"/></div>
+    <div style="flex:1;min-width:180px"><label>Mật khẩu</label><input type="text" [(ngModel)]="form.password"/></div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px"><label>Họ tên chủ</label><input type="text" [(ngModel)]="form.fullName"/></div>
+    <div style="flex:1;min-width:180px"><label>SĐT</label><input type="text" [(ngModel)]="form.phone"/></div>
+  </div>
+  <label>Tên khách sạn</label><input type="text" [(ngModel)]="form.hotelName"/>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:140px"><label>Thành phố</label><input type="text" [(ngModel)]="form.city"/></div>
+    <div style="flex:2;min-width:180px"><label>Địa chỉ</label><input type="text" [(ngModel)]="form.address"/></div>
+    <div style="min-width:90px"><label>Sao</label><input type="number" min="1" max="5" [(ngModel)]="form.starRating"/></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn" (click)="createVendor()" [disabled]="saving || !form.email || !form.password || !form.hotelName">Tạo</button>
+    <button class="btn ghost" (click)="cancelForm()">Huỷ</button>
+  </div>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead><tr><th>Email</th><th>Chủ</th><th>Khách sạn</th><th>Trạng thái</th><th></th></tr></thead>
+  <tbody>
+    <tr *ngFor="let v of vendors">
+      <td>{{ v.email }}</td>
+      <td>{{ v.fullName }}</td>
+      <td>{{ v.hotelName }} <span class="muted" *ngIf="v.hotelId">(#{{ v.hotelId }})</span></td>
+      <td><span [ngClass]="'badge ' + (v.status | lowercase)">{{ v.status }}</span></td>
+      <td class="actions">
+        <button class="btn" *ngIf="v.status === 'INACTIVE'" (click)="approve(v)">Duyệt</button>
+        <button class="btn danger" *ngIf="v.status !== 'LOCKED'" (click)="reject(v)">Từ chối</button>
+      </td>
+    </tr>
+    <tr *ngIf="vendors.length === 0"><td colspan="5" class="muted">Không có vendor.</td></tr>
+  </tbody>
+</table>

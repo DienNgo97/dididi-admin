@@ -4,11 +4,12 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif; c
 a{ color:var(--brand); text-decoration:none; }
 .topnav{ display:flex; align-items:center; gap:18px; background:#fff; border-bottom:1px solid var(--line); padding:12px 24px; }
 .topnav .brand{ font-weight:800; font-size:18px; color:var(--brand); }
+.topnav nav{ display:flex; gap:16px; }
 .topnav nav a{ color:var(--ink); font-weight:500; }
 .topnav nav a.active{ color:var(--brand); }
 .topnav .sp{ flex:1; }
 .topnav .user{ color:var(--muted); font-size:14px; display:flex; align-items:center; gap:10px; }
-.content{ max-width:980px; margin:24px auto; padding:0 16px; }
+.content{ max-width:1080px; margin:24px auto; padding:0 16px; }
 .page-head{ display:flex; align-items:center; justify-content:space-between; }
 .btn{ background:var(--brand); color:#fff; border:0; padding:9px 16px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
 .btn:hover{ background:var(--brand-dark); }
@@ -30,3 +31,24 @@ a{ color:var(--brand); text-decoration:none; }
 .form .chk{ display:flex; align-items:center; gap:8px; margin-top:14px; }
 .form .chk input{ width:auto; }
 .form-actions{ display:flex; gap:10px; margin-top:18px; }
+
+/* ---- Phase 4b: dashboard cards, badges, filters, pager ---- */
+.cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin:16px 0; }
+.card{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; }
+.card .k{ font-size:13px; color:var(--muted); }
+.card .v{ font-size:24px; font-weight:800; margin-top:6px; }
+.card.brand .v{ color:var(--brand); }
+.section-title{ font-size:15px; font-weight:700; margin:22px 0 4px; }
+.filters{ display:flex; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.filters select,.tbl select{ padding:8px 10px; border:1px solid #cdd3dd; border-radius:8px; font-size:14px; background:#fff; }
+.pager{ display:flex; align-items:center; gap:12px; margin-top:14px; }
+.badge{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:12px; font-weight:600; }
+.badge.confirmed{ background:#e4f6ec; color:#1b7a43; }
+.badge.pending_payment{ background:#fff3da; color:#9a6a00; }
+.badge.cancelled{ background:#fbe6e3; color:var(--danger); }
+.badge.failed{ background:#eceff3; color:#5b6472; }
+
+/* ---- Phase 7d: badge trang thai vendor ---- */
+.badge.active{ background:#e4f6ec; color:#1b7a43; }
+.badge.inactive{ background:#fff3da; color:#9a6a00; }
+.badge.locked{ background:#fbe6e3; color:var(--danger); }
