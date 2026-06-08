@@ -18,9 +18,17 @@ export class LoginComponent {
     this.error = '';
     this.loading = true;
     this.auth.login(this.email, this.password).subscribe({
-      next: () => {
+      next: (res) => {
         this.loading = false;
-        this.router.navigate(['/hotels']);
+        if (res.role === 'VENDOR') {
+          this.router.navigate(['/vendor']);
+        } else if (res.role === 'ADMIN' || res.role === 'SUPER_ADMIN') {
+          this.router.navigate(['/dashboard']);
+        } else {
+          // Tai khoan khach (CUSTOMER) khong co quyen vao trang quan tri
+          this.auth.logout();
+          this.error = 'Tài khoản này không có quyền truy cập trang quản trị (chỉ dành cho admin/vendor).';
+        }
       },
       error: (err) => {
         this.loading = false;

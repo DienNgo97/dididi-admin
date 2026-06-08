@@ -1,7 +1,15 @@
 <header class="topnav">
-  <a class="brand" routerLink="/hotels">Dididi Admin</a>
-  <nav *ngIf="auth.isLoggedIn()">
+  <a class="brand" [routerLink]="auth.role === 'VENDOR' ? '/vendor' : '/dashboard'">Dididi Admin</a>
+  <nav *ngIf="auth.isLoggedIn() && auth.role !== 'VENDOR'">
+    <a routerLink="/dashboard" routerLinkActive="active">Tổng quan</a>
     <a routerLink="/hotels" routerLinkActive="active">Khách sạn</a>
+    <a routerLink="/flights" routerLinkActive="active">Chuyến bay</a>
+    <a routerLink="/bookings" routerLinkActive="active">Đơn đặt</a>
+    <a routerLink="/users" routerLinkActive="active">Người dùng</a>
+    <a routerLink="/vendors" routerLinkActive="active">Vendors</a>
+  </nav>
+  <nav *ngIf="auth.isLoggedIn() && auth.role === 'VENDOR'">
+    <a routerLink="/vendor" routerLinkActive="active">Khách sạn của tôi</a>
   </nav>
   <span class="sp"></span>
   <span class="user" *ngIf="auth.isLoggedIn()">

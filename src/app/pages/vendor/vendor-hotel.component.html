@@ -1,0 +1,84 @@
+<div class="page-head"><h1>Khách sạn của tôi</h1></div>
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<ng-container *ngIf="hotel as h">
+  <div class="card">
+    <div style="font-size:18px;font-weight:700">{{ h.name }}
+      <span class="muted" *ngIf="h.starRating"> · {{ h.starRating }}★</span>
+    </div>
+    <div class="muted">{{ h.city }}<span *ngIf="h.address"> · {{ h.address }}</span></div>
+    <p class="muted" *ngIf="h.description">{{ h.description }}</p>
+  </div>
+
+  <div class="page-head" style="margin-top:22px">
+    <div class="section-title">Loại phòng</div>
+    <button class="btn" (click)="newRoomType()">+ Thêm loại phòng</button>
+  </div>
+
+  <div class="form" *ngIf="showForm">
+    <label>Tên loại phòng</label>
+    <input type="text" [(ngModel)]="form.name" placeholder="VD: Phòng Standard"/>
+    <label>Mô tả</label>
+    <input type="text" [(ngModel)]="form.description"/>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px"><label>Sức chứa</label>
+        <input type="number" min="1" [(ngModel)]="form.capacity"/></div>
+      <div style="flex:1;min-width:120px"><label>Giá/đêm (VND)</label>
+        <input type="number" min="0" [(ngModel)]="form.basePrice"/></div>
+      <div style="flex:1;min-width:120px"><label>Tổng số phòng</label>
+        <input type="number" min="0" [(ngModel)]="form.totalRooms"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" (click)="saveRoomType()" [disabled]="saving || !form.name">
+        {{ editingId == null ? 'Tạo' : 'Lưu' }}</button>
+      <button class="btn ghost" (click)="cancelForm()">Huỷ</button>
+    </div>
+  </div>
+
+  <table class="tbl">
+    <thead><tr><th>Tên</th><th>Sức chứa</th><th>Giá/đêm</th><th>Tổng phòng</th><th></th></tr></thead>
+    <tbody>
+      <tr *ngFor="let rt of roomTypes">
+        <td>{{ rt.name }}</td>
+        <td>{{ rt.capacity }}</td>
+        <td>{{ rt.basePrice | number }} {{ rt.currency }}</td>
+        <td>{{ rt.totalRooms }}</td>
+        <td class="actions">
+          <button class="btn ghost" (click)="selectRoom(rt)">Tồn kho</button>
+          <button class="btn ghost" (click)="editRoomType(rt)">Sửa</button>
+          <button class="btn danger" (click)="deleteRoomType(rt)">Xoá</button>
+        </td>
+      </tr>
+      <tr *ngIf="roomTypes.length === 0"><td colspan="5" class="muted">Chưa có loại phòng nào. Bấm "Thêm loại phòng".</td></tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="selected as s" style="margin-top:24px">
+    <div class="section-title">Tồn kho theo ngày — {{ s.name }}</div>
+    <div class="err" *ngIf="invError">{{ invError }}</div>
+    <div class="filters">
+      <div><label class="muted">Từ ngày</label><br/><input type="date" [(ngModel)]="invFrom"/></div>
+      <div><label class="muted">Đến ngày</label><br/><input type="date" [(ngModel)]="invTo"/></div>
+      <button class="btn ghost" (click)="loadInventory()">Xem</button>
+    </div>
+    <div class="filters" style="margin-top:8px">
+      <div><label class="muted">Số phòng trống</label><br/><input type="number" min="0" [(ngModel)]="invAvailable"/></div>
+      <div><label class="muted">Giá/đêm (tuỳ chọn)</label><br/><input type="number" min="0" [(ngModel)]="invPrice"/></div>
+      <button class="btn" (click)="saveInventory()">Cập nhật cho khoảng ngày</button>
+    </div>
+    <p class="muted" *ngIf="invMsg">{{ invMsg }}</p>
+    <p class="muted" *ngIf="invLoading">Đang tải...</p>
+    <table class="tbl" *ngIf="!invLoading">
+      <thead><tr><th>Ngày</th><th>Phòng trống</th><th>Giá</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let d of invRows">
+          <td>{{ d.date }}</td>
+          <td>{{ d.availableRooms }}</td>
+          <td>{{ d.price != null ? (d.price | number) + ' ' + s.currency : '(theo giá gốc)' }}</td>
+        </tr>
+        <tr *ngIf="invRows.length === 0"><td colspan="3" class="muted">Chưa set ngày nào trong khoảng (mặc định = tổng số phòng).</td></tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
