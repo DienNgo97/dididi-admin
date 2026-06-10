@@ -2,6 +2,26 @@
 
 <div class="err" *ngIf="error">{{ error }}</div>
 
+<div class="card" *ngIf="auth.role === 'SUPER_ADMIN'" style="margin-bottom:16px">
+  <button class="btn ghost" (click)="showCreate = !showCreate">{{ showCreate ? 'Đóng' : '+ Tạo tài khoản quản trị' }}</button>
+  <div *ngIf="showCreate" style="margin-top:12px">
+    <div *ngIf="createMsg" style="color:#2e7d32;margin-bottom:8px">{{ createMsg }}</div>
+    <div class="filters" style="flex-wrap:wrap;gap:8px">
+      <input type="email" [(ngModel)]="newUser.email" placeholder="Email"
+             style="padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+      <input type="text" [(ngModel)]="newUser.fullName" placeholder="Họ tên"
+             style="padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+      <input type="password" [(ngModel)]="newUser.password" placeholder="Mật khẩu (≥6)"
+             style="padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+      <select [(ngModel)]="newUser.role" style="padding:8px;border:1px solid #cdd3dd;border-radius:8px">
+        <option value="ADMIN">ADMIN</option>
+        <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+      </select>
+      <button class="btn" (click)="createAdmin()" [disabled]="creating">{{ creating ? 'Đang tạo...' : 'Tạo' }}</button>
+    </div>
+  </div>
+</div>
+
 <div class="filters">
   <label class="muted">Vai trò:</label>
   <select [ngModel]="role" (ngModelChange)="role = $event; onFilterChange()">

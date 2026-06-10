@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../api/user.service';
-import { AdminUser, PagedResponse } from '../../core/admin-models';
+import { AuthService } from '../../core/auth.service';
+import { AdminUser, PagedResponse, CreateAdminRequest } from '../../core/admin-models';
 
 @Component({
   selector: 'app-user-list',
@@ -16,7 +17,12 @@ export class UserListComponent implements OnInit {
   roles = ['', 'CUSTOMER', 'VENDOR', 'ADMIN', 'SUPER_ADMIN'];
   statuses = ['ACTIVE', 'INACTIVE', 'LOCKED'];
 
-  constructor(private userService: UserService) {}
+  showCreate = false;
+  creating = false;
+  createMsg = '';
+  newUser: CreateAdminRequest = { email: '', fullName: '', password: '', role: 'ADMIN' };
+
+  constructor(public auth: AuthService, private userService: UserService) {}
 
   ngOnInit(): void { this.load(); }
 
@@ -48,6 +54,25 @@ export class UserListComponent implements OnInit {
     this.userService.changeRole(u.id, role).subscribe({
       next: (updated) => { u.role = updated.role; },
       error: (err) => { u.role = prev; alert(err?.error?.message || 'Đổi vai trò thất bại'); }
+    });
+  }
+
+  createAdmin(): void {
+    this.createMsg = '';
+    if (!this.newUser.email || !this.newUser.password || this.newUser.password.length < 6) {
+      alert('Cần email và mật khẩu tối thiểu 6 ký tự');
+      return;
+    }
+    this.creating = true;
+    this.userService.create(this.newUser).subscribe({
+      next: () => {
+        this.creating = false;
+        this.createMsg = 'Đã tạo tài khoản ' + this.newUser.email;
+        this.newUser = { email: '', fullName: '', password: '', role: 'ADMIN' };
+        this.page = 0;
+        this.load();
+      },
+      error: (err) => { this.creating = false; alert(err?.error?.message || 'Tạo tài khoản thất bại'); }
     });
   }
 }

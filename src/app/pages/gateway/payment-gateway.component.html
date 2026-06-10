@@ -1,0 +1,21 @@
+<div class="page-head"><h1>Cổng thanh toán (VNPay)</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin-bottom:10px">{{ msg }}</div>
+
+<div class="form" *ngIf="cfg" style="max-width:560px">
+  <label>TMN Code</label>
+  <input type="text" [(ngModel)]="model.tmnCode" name="tmnCode"/>
+  <label>Hash Secret
+    <span class="muted">(hiện tại: {{ cfg.hashSecretMasked || '—' }} · để trống = giữ nguyên)</span></label>
+  <input type="text" [(ngModel)]="model.hashSecret" name="hashSecret" placeholder="Nhập mới để thay, để trống để giữ"/>
+  <label>Pay URL</label>
+  <input type="text" [(ngModel)]="model.payUrl" name="payUrl"/>
+  <label>Return URL</label>
+  <input type="text" [(ngModel)]="model.returnUrl" name="returnUrl"/>
+  <label class="chk"><input type="checkbox" [(ngModel)]="model.enabled" name="enabled"/> Bật cổng VNPay</label>
+  <div class="form-actions">
+    <button class="btn" (click)="save()" [disabled]="saving">{{ saving ? 'Đang lưu...' : 'Lưu cấu hình' }}</button>
+  </div>
+  <p class="muted">Sửa ở đây có hiệu lực ngay cho luồng thanh toán VNPay (ưu tiên DB, fallback application.yml).</p>
+</div>

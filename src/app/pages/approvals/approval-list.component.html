@@ -1,0 +1,26 @@
+<div class="page-head"><h1>Phê duyệt đặt B2B</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin-bottom:10px">{{ msg }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead>
+    <tr><th>Mã đơn</th><th>Tiêu đề</th><th>Công ty</th><th>Người đặt</th><th>Số tiền</th><th>Tạo lúc</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of items">
+      <td>{{ r.bookingCode }}</td>
+      <td>{{ r.bookingTitle }}</td>
+      <td>{{ r.companyName }}</td>
+      <td>{{ r.requestedByEmail }}</td>
+      <td>{{ r.amount | number }} đ</td>
+      <td>{{ r.createdAt }}</td>
+      <td class="actions">
+        <button class="btn" (click)="approve(r)" [disabled]="busyId === r.id">Duyệt</button>
+        <button class="btn danger" (click)="reject(r)" [disabled]="busyId === r.id">Từ chối</button>
+      </td>
+    </tr>
+    <tr *ngIf="items.length === 0"><td colspan="7" class="muted">Không có yêu cầu chờ duyệt.</td></tr>
+  </tbody>
+</table>

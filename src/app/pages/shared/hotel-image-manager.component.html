@@ -1,0 +1,22 @@
+<div class="card" style="margin-top:16px">
+  <div class="page-head">
+    <h2 style="margin:0">Ảnh khách sạn</h2>
+    <label class="btn" style="cursor:pointer">
+      {{ uploading ? 'Đang tải...' : '+ Thêm ảnh' }}
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploading" hidden/>
+    </label>
+  </div>
+
+  <div class="err" *ngIf="error">{{ error }}</div>
+  <p class="muted" *ngIf="loading">Đang tải ảnh...</p>
+
+  <div *ngIf="!loading" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px">
+    <div *ngFor="let img of images" style="position:relative">
+      <img [src]="absUrl(img)" alt="ảnh khách sạn"
+           style="width:180px;height:135px;object-fit:cover;border-radius:10px;border:1px solid #e2e6ee"/>
+      <button class="btn danger" (click)="remove(img)"
+              style="position:absolute;top:6px;right:6px;padding:2px 8px">Xoá</button>
+    </div>
+    <p class="muted" *ngIf="images.length === 0">Chưa có ảnh nào. Bấm "+ Thêm ảnh" để tải lên.</p>
+  </div>
+</div>

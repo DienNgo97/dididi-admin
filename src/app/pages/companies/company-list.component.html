@@ -1,0 +1,25 @@
+<div class="page-head">
+  <h1>Công ty (B2B)</h1>
+  <button class="btn" (click)="add()">+ Thêm công ty</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead>
+    <tr><th>Tên</th><th>Mã</th><th>Hạn mức tổng</th><th>Đã dùng</th><th>Còn lại</th><th>Trạng thái</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of companies">
+      <td>{{ c.name }}</td>
+      <td>{{ c.code }}</td>
+      <td>{{ c.budgetTotal | number }} đ</td>
+      <td>{{ c.budgetUsed | number }} đ</td>
+      <td><b>{{ c.remaining | number }} đ</b></td>
+      <td><span [ngClass]="c.active ? 'badge active' : 'badge'">{{ c.active ? 'Hoạt động' : 'Khoá' }}</span></td>
+      <td class="actions"><button class="btn ghost" (click)="manage(c)">Quản lý</button></td>
+    </tr>
+    <tr *ngIf="companies.length === 0"><td colspan="7" class="muted">Chưa có công ty.</td></tr>
+  </tbody>
+</table>

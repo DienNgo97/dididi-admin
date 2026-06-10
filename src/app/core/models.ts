@@ -24,3 +24,10 @@ export interface Hotel {
   currency?: string;
   active?: boolean;
 }
+
+export interface HotelImage {
+  id: number;
+  hotelId: number;
+  sortOrder: number;
+  url: string; // tương đối, ví dụ /api/v1/hotels/1/images/5
+}

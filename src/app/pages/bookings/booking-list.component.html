@@ -24,6 +24,9 @@
       <td>{{ b.amount | number }} {{ b.currency }}</td>
       <td><span [ngClass]="'badge ' + (b.status | lowercase)">{{ b.status }}</span></td>
       <td class="actions">
+        <button class="btn" *ngIf="b.status === 'CONFIRMED'" [disabled]="refunding === b.id" (click)="refund(b)">
+          {{ refunding === b.id ? 'Đang hoàn...' : 'Hoàn tiền' }}
+        </button>
         <button class="btn danger" *ngIf="b.status !== 'CANCELLED'" (click)="cancel(b)">Huỷ</button>
       </td>
     </tr>
@@ -36,3 +39,27 @@
   <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} đơn</span>
   <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
 </div>
+
+<div class="filters" style="margin-top:18px">
+  <button class="btn ghost" (click)="toggleHistory()">
+    {{ showHistory ? 'Ẩn' : 'Xem' }} lịch sử hoàn tiền
+  </button>
+</div>
+
+<table class="tbl" *ngIf="showHistory">
+  <thead>
+    <tr><th>#</th><th>Booking ID</th><th>Số tiền</th><th>Lý do</th><th>Trạng thái</th><th>Người xử lý</th><th>Thời điểm</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of refunds">
+      <td>{{ r.id }}</td>
+      <td>{{ r.bookingId }}</td>
+      <td>{{ r.amount | number }} {{ r.currency }}</td>
+      <td>{{ r.reason }}</td>
+      <td><span [ngClass]="'badge ' + (r.status | lowercase)">{{ r.status }}</span></td>
+      <td>{{ r.processedBy }}</td>
+      <td>{{ r.createdAt }}</td>
+    </tr>
+    <tr *ngIf="refunds.length === 0"><td colspan="7" class="muted">Chưa có lần hoàn nào.</td></tr>
+  </tbody>
+</table>

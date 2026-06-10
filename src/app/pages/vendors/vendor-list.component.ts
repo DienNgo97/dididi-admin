@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminVendorService, CreateVendorReq } from '../../api/admin-vendor.service';
+import { AuthService } from '../../core/auth.service';
 import { VendorAccount } from '../../core/vendor-models';
 
 @Component({
@@ -16,7 +17,7 @@ export class VendorListComponent implements OnInit {
   form: CreateVendorReq = this.emptyForm();
   saving = false;
 
-  constructor(private adminVendorService: AdminVendorService) {}
+  constructor(private adminVendorService: AdminVendorService, public auth: AuthService) {}
 
   ngOnInit(): void { this.load(); }
 
@@ -42,6 +43,22 @@ export class VendorListComponent implements OnInit {
     this.adminVendorService.reject(v.userId).subscribe({
       next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; },
       error: (err) => alert(err?.error?.message || 'Từ chối thất bại')
+    });
+  }
+
+  ban(v: VendorAccount): void {
+    const reason = prompt('Ban vendor ' + v.email + '?\nLý do:', 'Vi phạm chính sách');
+    if (reason === null) { return; }
+    this.adminVendorService.ban(v.userId, reason).subscribe({
+      next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; },
+      error: (err) => alert(err?.error?.message || 'Ban thất bại')
+    });
+  }
+
+  unban(v: VendorAccount): void {
+    this.adminVendorService.unban(v.userId).subscribe({
+      next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; },
+      error: (err) => alert(err?.error?.message || 'Gỡ ban thất bại')
     });
   }
 

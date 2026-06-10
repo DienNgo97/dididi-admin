@@ -14,6 +14,15 @@ import { BookingListComponent } from './pages/bookings/booking-list.component';
 import { UserListComponent } from './pages/users/user-list.component';
 import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
+import { ReviewAdminComponent } from './pages/reviews/review-admin.component';
+import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
+import { AuditLogComponent } from './pages/audit/audit-log.component';
+import { CommissionComponent } from './pages/commission/commission.component';
+import { ApprovalListComponent } from './pages/approvals/approval-list.component';
+import { PaymentGatewayComponent } from './pages/gateway/payment-gateway.component';
+import { HotelImageManagerComponent } from './pages/shared/hotel-image-manager.component';
+import { CompanyListComponent } from './pages/companies/company-list.component';
+import { CompanyFormComponent } from './pages/companies/company-form.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
 @NgModule({
@@ -27,7 +36,16 @@ import { AuthInterceptor } from './core/auth.interceptor';
     BookingListComponent,
     UserListComponent,
     VendorHotelComponent,
-    VendorListComponent
+    VendorListComponent,
+    ReviewAdminComponent,
+    VendorReviewComponent,
+    AuditLogComponent,
+    HotelImageManagerComponent,
+    CompanyListComponent,
+    CompanyFormComponent,
+    CommissionComponent,
+    PaymentGatewayComponent,
+    ApprovalListComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],

@@ -38,6 +38,16 @@ export class AdminVendorService {
     return this.http.post<ApiResponse<VendorAccount>>(`${this.base}/${userId}/reject`, {}).pipe(map((r) => r.data));
   }
 
+  ban(userId: number, reason?: string): Observable<VendorAccount> {
+    return this.http
+      .post<ApiResponse<VendorAccount>>(`${this.base}/${userId}/ban`, { reason: reason || '' })
+      .pipe(map((r) => r.data));
+  }
+
+  unban(userId: number): Observable<VendorAccount> {
+    return this.http.post<ApiResponse<VendorAccount>>(`${this.base}/${userId}/unban`, {}).pipe(map((r) => r.data));
+  }
+
   create(req: CreateVendorReq): Observable<VendorAccount> {
     return this.http.post<ApiResponse<VendorAccount>>(this.base, req).pipe(map((r) => r.data));
   }

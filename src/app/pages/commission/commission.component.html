@@ -1,0 +1,66 @@
+<div class="page-head"><h1>Hoa hồng</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin-bottom:10px">{{ msg }}</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Tỷ lệ mặc định</h3>
+  <div class="filters">
+    <input type="number" min="0" max="100" step="0.5" [(ngModel)]="defaultPercent"
+           style="width:120px;padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+    <span class="muted">%</span>
+    <button class="btn" (click)="saveDefault()" [disabled]="savingDefault">{{ savingDefault ? 'Đang lưu...' : 'Lưu' }}</button>
+  </div>
+  <p class="muted">Áp dụng cho mọi vendor chưa có tỷ lệ riêng.</p>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3 style="margin-top:0">Hoa hồng riêng theo vendor</h3>
+  <div class="filters" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <select [(ngModel)]="selVendorId" style="min-width:260px;padding:8px;border:1px solid #cdd3dd;border-radius:8px">
+      <option [ngValue]="null">— Chọn vendor —</option>
+      <option *ngFor="let v of vendorOptions" [ngValue]="v.id">{{ v.email }} ({{ v.fullName }})</option>
+    </select>
+    <input type="number" min="0" max="100" step="0.5" [(ngModel)]="selVendorPercent" placeholder="%"
+           style="width:90px;padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+    <button class="btn" (click)="addVendor()" [disabled]="!selVendorId || selVendorPercent == null">Đặt</button>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>Vendor</th><th>Email</th><th>Tỷ lệ</th><th></th></tr></thead>
+    <tbody>
+      <tr *ngFor="let v of vendors">
+        <td>{{ v.vendorName }}</td>
+        <td>{{ v.vendorEmail }}</td>
+        <td>{{ pct(v.rate) }}%</td>
+        <td class="actions"><button class="btn danger" (click)="removeVendor(v)">Gỡ</button></td>
+      </tr>
+      <tr *ngIf="vendors.length === 0"><td colspan="4" class="muted">Chưa có vendor đặt riêng (dùng mặc định).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3 style="margin-top:0">Báo cáo hoa hồng (đơn khách sạn đã xác nhận)</h3>
+  <table class="tbl" *ngIf="report">
+    <thead><tr><th>Vendor</th><th>Số đơn</th><th>Doanh thu</th><th>Tỷ lệ</th><th>Hoa hồng</th><th>Net trả vendor</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let r of report.rows">
+        <td>{{ r.vendorName }}</td>
+        <td>{{ r.bookingCount }}</td>
+        <td>{{ r.gross | number }} đ</td>
+        <td>{{ pct(r.rate) }}%</td>
+        <td>{{ r.commission | number }} đ</td>
+        <td>{{ r.net | number }} đ</td>
+      </tr>
+      <tr *ngIf="report.rows.length === 0"><td colspan="6" class="muted">Chưa có dữ liệu (cần đơn KS DIRECT đã xác nhận).</td></tr>
+    </tbody>
+    <tfoot *ngIf="report.rows.length > 0">
+      <tr style="font-weight:700;border-top:2px solid #cdd3dd">
+        <td>Tổng</td><td></td>
+        <td>{{ report.totalGross | number }} đ</td><td></td>
+        <td>{{ report.totalCommission | number }} đ</td>
+        <td>{{ report.totalNet | number }} đ</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
