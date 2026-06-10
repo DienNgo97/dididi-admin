@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { API_BASE } from '../core/api.config';
 import { ApiResponse } from '../core/models';
-import { AdminBooking, PagedResponse } from '../core/admin-models';
+import { AdminBooking, PagedResponse, Refund } from '../core/admin-models';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -22,6 +22,18 @@ export class BookingService {
   cancel(id: number): Observable<AdminBooking> {
     return this.http
       .post<ApiResponse<AdminBooking>>(`${this.base}/${id}/cancel`, {})
+      .pipe(map((r) => r.data));
+  }
+
+  refund(id: number, reason?: string): Observable<AdminBooking> {
+    return this.http
+      .post<ApiResponse<AdminBooking>>(`${this.base}/${id}/refund`, { reason: reason || '' })
+      .pipe(map((r) => r.data));
+  }
+
+  refundHistory(): Observable<Refund[]> {
+    return this.http
+      .get<ApiResponse<Refund[]>>(`${this.base}/refunds`)
       .pipe(map((r) => r.data));
   }
 }

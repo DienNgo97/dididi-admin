@@ -7,9 +7,16 @@
     <a routerLink="/bookings" routerLinkActive="active">Đơn đặt</a>
     <a routerLink="/users" routerLinkActive="active">Người dùng</a>
     <a routerLink="/vendors" routerLinkActive="active">Vendors</a>
+    <a routerLink="/companies" routerLinkActive="active">Công ty</a>
+    <a routerLink="/approvals" routerLinkActive="active">Phê duyệt</a>
+    <a routerLink="/reviews" routerLinkActive="active">Đánh giá</a>
+    <a routerLink="/audit" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Audit</a>
+    <a routerLink="/commission" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Hoa hồng</a>
+    <a routerLink="/payment-gateway" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Cổng TT</a>
   </nav>
   <nav *ngIf="auth.isLoggedIn() && auth.role === 'VENDOR'">
     <a routerLink="/vendor" routerLinkActive="active">Khách sạn của tôi</a>
+    <a routerLink="/vendor/reviews" routerLinkActive="active">Đánh giá</a>
   </nav>
   <span class="sp"></span>
   <span class="user" *ngIf="auth.isLoggedIn()">

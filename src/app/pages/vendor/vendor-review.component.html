@@ -1,0 +1,34 @@
+<div class="page-head"><h1>Đánh giá khách sạn của tôi</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<div *ngIf="!loading && data">
+  <div class="card" *ngFor="let r of data.content" style="margin-bottom:12px">
+    <div>
+      <b>{{ r.reviewerName }}</b> · {{ r.rating }}★
+      <span [ngClass]="'badge ' + (r.status | lowercase)">{{ r.status }}</span>
+      <span class="muted" style="float:right">{{ r.createdAt }}</span>
+    </div>
+    <p *ngIf="r.comment">{{ r.comment }}</p>
+
+    <div *ngIf="r.vendorReply" class="muted" style="border-left:3px solid #cdd3dd;padding-left:10px;margin-top:6px">
+      <b>Bạn đã trả lời:</b> {{ r.vendorReply }}
+    </div>
+
+    <div *ngIf="!r.vendorReply" style="margin-top:8px">
+      <textarea rows="2" [(ngModel)]="replyText[r.id]" placeholder="Viết phản hồi tới khách..."
+                style="width:100%;padding:8px;border:1px solid #cdd3dd;border-radius:8px"></textarea>
+      <button class="btn" [disabled]="busy === r.id" (click)="sendReply(r)" style="margin-top:6px">
+        {{ busy === r.id ? 'Đang gửi...' : 'Trả lời' }}
+      </button>
+    </div>
+  </div>
+  <p class="muted" *ngIf="data.content.length === 0">Chưa có đánh giá nào cho khách sạn của bạn.</p>
+</div>
+
+<div class="pager" *ngIf="data">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} đánh giá</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>

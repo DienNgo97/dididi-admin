@@ -1,0 +1,35 @@
+<div class="page-head"><h1>Nhật ký hành động (Audit log)</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters">
+  <label class="muted">Hành động:</label>
+  <select [ngModel]="action" (ngModelChange)="action = $event; onFilterChange()">
+    <option *ngFor="let a of actions" [value]="a">{{ a || 'Tất cả' }}</option>
+  </select>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading && data">
+  <thead>
+    <tr><th>#</th><th>Thời điểm</th><th>Người làm</th><th>Hành động</th><th>Đối tượng</th><th>Chi tiết</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of data.content">
+      <td>{{ a.id }}</td>
+      <td>{{ a.createdAt }}</td>
+      <td>{{ a.actorEmail || a.actorUserId }}</td>
+      <td><span [ngClass]="'badge ' + (a.action | lowercase)">{{ a.action }}</span></td>
+      <td>{{ a.targetType }} <span *ngIf="a.targetId">#{{ a.targetId }}</span></td>
+      <td>{{ a.detail }}</td>
+    </tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="6" class="muted">Chưa có nhật ký.</td></tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="data">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} dòng</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>

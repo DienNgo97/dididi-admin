@@ -1,0 +1,113 @@
+<p class="muted"><a (click)="back()" style="cursor:pointer">← Công ty</a></p>
+<h1>{{ id ? 'Quản lý công ty' : 'Thêm công ty' }}</h1>
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="form">
+  <label>Tên *</label>
+  <input type="text" [(ngModel)]="model.name" name="name"/>
+  <label>Mã công ty *</label>
+  <input type="text" [(ngModel)]="model.code" name="code"/>
+  <label>Hạn mức tổng (VND)</label>
+  <input type="number" min="0" [(ngModel)]="model.budgetTotal" name="budgetTotal"/>
+  <label>Email phòng tài chính</label>
+  <input type="text" [(ngModel)]="model.contactEmail" name="contactEmail"/>
+  <label>Mã số thuế (MST)</label>
+  <input type="text" [(ngModel)]="model.taxCode" name="taxCode" placeholder="VD: 0301234567"/>
+  <label>Địa chỉ (in trên hóa đơn VAT)</label>
+  <input type="text" [(ngModel)]="model.address" name="address" placeholder="VD: 123 Đồng Khởi, Quận 1, TP.HCM"/>
+  <label>Ngưỡng cần phê duyệt (VND)
+    <span class="muted">— đơn trả bằng ngân sách công ty vượt mức này sẽ chờ duyệt; để trống/0 = không cần duyệt</span></label>
+  <input type="number" min="0" [(ngModel)]="model.approvalThreshold" name="approvalThreshold"/>
+  <label class="chk"><input type="checkbox" [(ngModel)]="model.active" name="active"/> Đang hoạt động</label>
+  <div class="form-actions">
+    <button class="btn" (click)="save()" [disabled]="saving">{{ saving ? 'Đang lưu...' : 'Lưu' }}</button>
+    <button class="btn ghost" (click)="back()">Huỷ</button>
+  </div>
+</div>
+
+<ng-container *ngIf="id && company">
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">Hạn mức</h3>
+    <p>Tổng: <b>{{ company.budgetTotal | number }} đ</b> · Đã dùng: <b>{{ company.budgetUsed | number }} đ</b>
+       · Còn lại: <b>{{ company.remaining | number }} đ</b></p>
+    <div class="filters">
+      <div><label class="muted">Nạp thêm (VND)</label><br/>
+        <input type="number" min="0" [(ngModel)]="topupAmount"/></div>
+      <button class="btn" (click)="topup()" [disabled]="!topupAmount">Nạp thêm hạn mức</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">Nhân viên</h3>
+    <div class="filters" style="margin-bottom:10px">
+      <select [(ngModel)]="selectedUserId"
+              style="padding:8px;border:1px solid #cdd3dd;border-radius:8px;min-width:280px">
+        <option [ngValue]="null">— Chọn người dùng để gán —</option>
+        <option *ngFor="let u of allUsers" [ngValue]="u.id">{{ u.email }} ({{ u.role }})</option>
+      </select>
+      <button class="btn" (click)="assign()" [disabled]="!selectedUserId">Gán vào công ty</button>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Email</th><th>Họ tên</th><th>Vai trò</th><th></th></tr></thead>
+      <tbody>
+        <tr *ngFor="let e of employees">
+          <td>{{ e.email }}</td>
+          <td>{{ e.fullName }}</td>
+          <td>{{ e.role }}</td>
+          <td class="actions"><button class="btn danger" (click)="unassign(e)">Gỡ</button></td>
+        </tr>
+        <tr *ngIf="employees.length === 0"><td colspan="4" class="muted">Chưa có nhân viên.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">Chi tiêu (đơn trả bằng ngân sách công ty)</h3>
+    <table class="tbl">
+      <thead><tr><th>Mã đơn</th><th>Loại</th><th>Tiêu đề</th><th>Số tiền</th><th>Trạng thái</th><th>Ngày</th><th></th></tr></thead>
+      <tbody>
+        <tr *ngFor="let b of bookings">
+          <td>{{ b.publicCode }}</td>
+          <td>{{ b.type }}</td>
+          <td>{{ b.title }}</td>
+          <td>{{ b.amount | number }} {{ b.currency }}</td>
+          <td>{{ b.status }}</td>
+          <td>{{ b.createdAt }}</td>
+          <td class="actions"><button class="btn ghost" *ngIf="b.status === 'CONFIRMED'" (click)="downloadInvoice(b.publicCode)">Hóa đơn</button></td>
+        </tr>
+        <tr *ngIf="bookings.length === 0"><td colspan="7" class="muted">Chưa có chi tiêu.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">Lời mời booker</h3>
+    <div class="filters" style="margin-bottom:10px">
+      <input type="email" [(ngModel)]="newInviteEmail" placeholder="Email người được mời"
+             style="padding:8px;border:1px solid #cdd3dd;border-radius:8px;min-width:280px"/>
+      <button class="btn" (click)="createInvite()" [disabled]="!newInviteEmail">Mời</button>
+    </div>
+    <div *ngIf="inviteMsg" style="color:#2e7d32;margin-bottom:8px">
+      {{ inviteMsg }}
+      <div *ngIf="lastInviteUrl" style="margin-top:4px">
+        <code style="background:#f1f3f7;padding:4px 6px;border-radius:6px;word-break:break-all">{{ lastInviteUrl }}</code>
+        <button class="btn ghost" (click)="copyInviteUrl()" style="margin-left:8px">Copy link</button>
+      </div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Email</th><th>Trạng thái</th><th>Hết hạn</th><th>Link</th><th></th></tr></thead>
+      <tbody>
+        <tr *ngFor="let inv of invites">
+          <td>{{ inv.email }}</td>
+          <td>{{ inv.status }}</td>
+          <td>{{ inv.expiresAt }}</td>
+          <td><a [href]="inv.acceptUrl" target="_blank">mở</a></td>
+          <td class="actions">
+            <button class="btn danger" *ngIf="inv.status === 'PENDING'" (click)="revokeInvite(inv)">Thu hồi</button>
+          </td>
+        </tr>
+        <tr *ngIf="invites.length === 0"><td colspan="5" class="muted">Chưa có lời mời.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>

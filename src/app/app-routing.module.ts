@@ -9,6 +9,14 @@ import { BookingListComponent } from './pages/bookings/booking-list.component';
 import { UserListComponent } from './pages/users/user-list.component';
 import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
+import { ReviewAdminComponent } from './pages/reviews/review-admin.component';
+import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
+import { AuditLogComponent } from './pages/audit/audit-log.component';
+import { CommissionComponent } from './pages/commission/commission.component';
+import { ApprovalListComponent } from './pages/approvals/approval-list.component';
+import { PaymentGatewayComponent } from './pages/gateway/payment-gateway.component';
+import { CompanyListComponent } from './pages/companies/company-list.component';
+import { CompanyFormComponent } from './pages/companies/company-form.component';
 import { roleGuard } from './core/auth.guard';
 
 const ADMIN = ['ADMIN', 'SUPER_ADMIN'];
@@ -26,9 +34,18 @@ const routes: Routes = [
   { path: 'bookings', component: BookingListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'users', component: UserListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'vendors', component: VendorListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'reviews', component: ReviewAdminComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'companies', component: CompanyListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'companies/new', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'companies/:id/edit', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'approvals', component: ApprovalListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'audit', component: AuditLogComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
+  { path: 'commission', component: CommissionComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
+  { path: 'payment-gateway', component: PaymentGatewayComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
 
   // Khu vendor
   { path: 'vendor', component: VendorHotelComponent, canActivate: [roleGuard('VENDOR')] },
+  { path: 'vendor/reviews', component: VendorReviewComponent, canActivate: [roleGuard('VENDOR')] },
 
   { path: '**', redirectTo: 'dashboard' }
 ];

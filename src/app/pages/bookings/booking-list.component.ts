@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BookingService } from '../../api/booking.service';
-import { AdminBooking, PagedResponse } from '../../core/admin-models';
+import { AdminBooking, PagedResponse, Refund } from '../../core/admin-models';
 
 @Component({
   selector: 'app-booking-list',
@@ -14,6 +14,9 @@ export class BookingListComponent implements OnInit {
   loading = false;
   error = '';
   statuses = ['', 'PENDING_PAYMENT', 'CONFIRMED', 'CANCELLED', 'FAILED'];
+  refunding = 0;
+  showHistory = false;
+  refunds: Refund[] = [];
 
   constructor(private bookingService: BookingService) {}
 
@@ -37,6 +40,36 @@ export class BookingListComponent implements OnInit {
     this.bookingService.cancel(b.id).subscribe({
       next: () => this.load(),
       error: (err) => alert(err?.error?.message || 'Huỷ thất bại')
+    });
+  }
+
+  refund(b: AdminBooking): void {
+    if (b.status !== 'CONFIRMED') { return; }
+    const reason = prompt(
+      'Hoàn tiền đơn ' + b.publicCode + ' (' + b.amount + ' ' + b.currency + ')?\nLý do:',
+      'Khách đổi lịch'
+    );
+    if (reason === null) { return; }            // bấm Cancel
+    this.refunding = b.id;
+    this.bookingService.refund(b.id, reason).subscribe({
+      next: () => {
+        this.refunding = 0;
+        this.load();
+        if (this.showHistory) { this.loadHistory(); }
+      },
+      error: (err) => { this.refunding = 0; alert(err?.error?.message || 'Hoàn tiền thất bại'); }
+    });
+  }
+
+  toggleHistory(): void {
+    this.showHistory = !this.showHistory;
+    if (this.showHistory) { this.loadHistory(); }
+  }
+
+  loadHistory(): void {
+    this.bookingService.refundHistory().subscribe({
+      next: (rs) => (this.refunds = rs),
+      error: () => {}
     });
   }
 }

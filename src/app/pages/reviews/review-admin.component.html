@@ -1,0 +1,44 @@
+<div class="page-head"><h1>Kiểm duyệt đánh giá</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters">
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option *ngFor="let s of statuses" [value]="s">{{ s || 'Tất cả' }}</option>
+  </select>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading && data">
+  <thead>
+    <tr>
+      <th>#</th><th>Khách</th><th>Đối tượng</th><th>Sao</th>
+      <th>Nhận xét</th><th>Phản hồi KS</th><th>Trạng thái</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of data.content">
+      <td>{{ r.id }}</td>
+      <td>{{ r.reviewerName }}</td>
+      <td>{{ r.targetType }} #{{ r.targetId }}</td>
+      <td>{{ r.rating }}★</td>
+      <td>{{ r.comment }}</td>
+      <td>{{ r.vendorReply }}</td>
+      <td><span [ngClass]="'badge ' + (r.status | lowercase)">{{ r.status }}</span></td>
+      <td class="actions">
+        <button class="btn" *ngIf="r.status !== 'PUBLISHED'" [disabled]="busy === r.id" (click)="publish(r)">Hiện</button>
+        <button class="btn ghost" *ngIf="r.status !== 'HIDDEN'" [disabled]="busy === r.id" (click)="hide(r)">Ẩn</button>
+        <button class="btn danger" [disabled]="busy === r.id" (click)="remove(r)">Xoá</button>
+      </td>
+    </tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="8" class="muted">Không có đánh giá.</td></tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="data">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages || 1 }} · {{ data.totalElements }} đánh giá</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>

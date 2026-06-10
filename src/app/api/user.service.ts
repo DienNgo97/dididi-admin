@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { API_BASE } from '../core/api.config';
 import { ApiResponse } from '../core/models';
-import { AdminUser, PagedResponse } from '../core/admin-models';
+import { AdminUser, PagedResponse, CreateAdminRequest } from '../core/admin-models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -31,5 +31,9 @@ export class UserService {
     return this.http
       .patch<ApiResponse<AdminUser>>(`${this.base}/${id}/role`, {}, { params })
       .pipe(map((r) => r.data));
+  }
+
+  create(req: CreateAdminRequest): Observable<AdminUser> {
+    return this.http.post<ApiResponse<AdminUser>>(this.base, req).pipe(map((r) => r.data));
   }
 }

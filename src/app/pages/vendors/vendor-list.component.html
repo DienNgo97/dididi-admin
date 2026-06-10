@@ -44,6 +44,8 @@
       <td class="actions">
         <button class="btn" *ngIf="v.status === 'INACTIVE'" (click)="approve(v)">Duyệt</button>
         <button class="btn danger" *ngIf="v.status !== 'LOCKED'" (click)="reject(v)">Từ chối</button>
+        <button class="btn danger" *ngIf="auth.role === 'SUPER_ADMIN' && v.status === 'ACTIVE'" (click)="ban(v)">Ban</button>
+        <button class="btn" *ngIf="auth.role === 'SUPER_ADMIN' && v.status === 'LOCKED'" (click)="unban(v)">Gỡ ban</button>
       </td>
     </tr>
     <tr *ngIf="vendors.length === 0"><td colspan="5" class="muted">Không có vendor.</td></tr>
