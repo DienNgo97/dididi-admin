@@ -217,3 +217,33 @@ export interface CompanyInvite {
   expiresAt?: string;
   acceptUrl: string;
 }
+
+// ---- Voucher / Mã giảm giá (nice-to-have) ----
+export interface Voucher {
+  id: number;
+  code: string;
+  description?: string;
+  discountType: 'PERCENT' | 'FIXED';
+  discountValue: number;
+  maxDiscount?: number | null;
+  minOrderAmount?: number | null;
+  usageLimit?: number | null;
+  perUserLimit?: number | null;
+  validFrom?: string | null;
+  validTo?: string | null;
+  active: boolean;
+}
+
+export interface VoucherUpsert {
+  code: string;
+  description?: string;
+  discountType: 'PERCENT' | 'FIXED';
+  discountValue: number;
+  maxDiscount?: number | null;
+  minOrderAmount?: number | null;
+  usageLimit?: number | null;
+  perUserLimit?: number | null;
+  validFrom?: string | null;
+  validTo?: string | null;
+  active: boolean;
+}
