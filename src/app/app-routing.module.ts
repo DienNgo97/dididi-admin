@@ -17,6 +17,7 @@ import { ApprovalListComponent } from './pages/approvals/approval-list.component
 import { PaymentGatewayComponent } from './pages/gateway/payment-gateway.component';
 import { CompanyListComponent } from './pages/companies/company-list.component';
 import { CompanyFormComponent } from './pages/companies/company-form.component';
+import { VoucherListComponent } from './pages/vouchers/voucher-list.component';
 import { roleGuard } from './core/auth.guard';
 
 const ADMIN = ['ADMIN', 'SUPER_ADMIN'];
@@ -39,6 +40,7 @@ const routes: Routes = [
   { path: 'companies/new', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'companies/:id/edit', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'approvals', component: ApprovalListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'vouchers', component: VoucherListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'audit', component: AuditLogComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
   { path: 'commission', component: CommissionComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
   { path: 'payment-gateway', component: PaymentGatewayComponent, canActivate: [roleGuard('SUPER_ADMIN')] },

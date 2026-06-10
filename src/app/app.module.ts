@@ -23,6 +23,7 @@ import { PaymentGatewayComponent } from './pages/gateway/payment-gateway.compone
 import { HotelImageManagerComponent } from './pages/shared/hotel-image-manager.component';
 import { CompanyListComponent } from './pages/companies/company-list.component';
 import { CompanyFormComponent } from './pages/companies/company-form.component';
+import { VoucherListComponent } from './pages/vouchers/voucher-list.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
 @NgModule({
@@ -45,7 +46,8 @@ import { AuthInterceptor } from './core/auth.interceptor';
     CompanyFormComponent,
     CommissionComponent,
     PaymentGatewayComponent,
-    ApprovalListComponent
+    ApprovalListComponent,
+    VoucherListComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],

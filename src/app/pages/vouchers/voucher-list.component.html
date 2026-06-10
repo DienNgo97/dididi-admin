@@ -1,0 +1,88 @@
+<div class="page-head">
+  <h1>Mã giảm giá (Voucher)</h1>
+  <button class="btn" (click)="add()" *ngIf="!showForm">+ Thêm voucher</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<!-- Form thêm / sửa -->
+<div class="card" *ngIf="showForm" style="margin-bottom:16px">
+  <h3 style="margin-top:0">{{ editingId ? 'Sửa voucher' : 'Thêm voucher' }}</h3>
+  <div class="err" *ngIf="formError">{{ formError }}</div>
+  <div class="form">
+    <label>Mã *</label>
+    <input type="text" [(ngModel)]="model.code" name="code" placeholder="VD: TET2026" [disabled]="!!editingId"/>
+    <label>Mô tả</label>
+    <input type="text" [(ngModel)]="model.description" name="description" placeholder="VD: Giảm 15% tối đa 300k"/>
+
+    <label>Loại giảm</label>
+    <select [(ngModel)]="model.discountType" name="discountType"
+            style="padding:8px;border:1px solid #cdd3dd;border-radius:8px">
+      <option value="PERCENT">Phần trăm (%)</option>
+      <option value="FIXED">Số tiền cố định (VND)</option>
+    </select>
+
+    <label>{{ model.discountType === 'PERCENT' ? 'Phần trăm giảm (vd 15 = 15%)' : 'Số tiền giảm (VND)' }} *</label>
+    <input type="number" min="0" [(ngModel)]="model.discountValue" name="discountValue"/>
+
+    <ng-container *ngIf="model.discountType === 'PERCENT'">
+      <label>Giảm tối đa (VND) <span class="muted">— để trống = không giới hạn</span></label>
+      <input type="number" min="0" [(ngModel)]="model.maxDiscount" name="maxDiscount"/>
+    </ng-container>
+
+    <label>Đơn tối thiểu (VND) <span class="muted">— để trống = không yêu cầu</span></label>
+    <input type="number" min="0" [(ngModel)]="model.minOrderAmount" name="minOrderAmount"/>
+
+    <label>Tổng lượt dùng <span class="muted">— để trống = không giới hạn</span></label>
+    <input type="number" min="0" [(ngModel)]="model.usageLimit" name="usageLimit"/>
+
+    <label>Lượt mỗi người <span class="muted">— để trống = không giới hạn</span></label>
+    <input type="number" min="0" [(ngModel)]="model.perUserLimit" name="perUserLimit"/>
+
+    <label>Hiệu lực từ ngày <span class="muted">— tuỳ chọn</span></label>
+    <input type="date" [(ngModel)]="validFromDate" name="validFromDate"/>
+    <label>Hiệu lực đến ngày <span class="muted">— tuỳ chọn</span></label>
+    <input type="date" [(ngModel)]="validToDate" name="validToDate"/>
+
+    <label class="chk"><input type="checkbox" [(ngModel)]="model.active" name="active"/> Đang áp dụng</label>
+
+    <div class="form-actions">
+      <button class="btn" (click)="save()" [disabled]="saving">{{ saving ? 'Đang lưu...' : 'Lưu' }}</button>
+      <button class="btn ghost" (click)="cancel()">Huỷ</button>
+    </div>
+  </div>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead>
+    <tr>
+      <th>Mã</th><th>Mô tả</th><th>Giảm</th><th>Đơn tối thiểu</th>
+      <th>Giới hạn (tổng / người)</th><th>Hiệu lực</th><th>Trạng thái</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let v of vouchers">
+      <td><b>{{ v.code }}</b></td>
+      <td class="muted">{{ v.description }}</td>
+      <td>
+        <span *ngIf="v.discountType === 'PERCENT'">{{ v.discountValue }}%<span *ngIf="v.maxDiscount" class="muted"> (tối đa {{ v.maxDiscount | number }}đ)</span></span>
+        <span *ngIf="v.discountType === 'FIXED'">{{ v.discountValue | number }}đ</span>
+      </td>
+      <td>{{ v.minOrderAmount ? (v.minOrderAmount | number) + 'đ' : '—' }}</td>
+      <td>{{ v.usageLimit ?? '∞' }} / {{ v.perUserLimit ?? '∞' }}</td>
+      <td>
+        <span *ngIf="v.validFrom">{{ v.validFrom | slice:0:10 }} </span>
+        <span *ngIf="v.validTo">→ {{ v.validTo | slice:0:10 }}</span>
+        <span *ngIf="!v.validFrom && !v.validTo" class="muted">không giới hạn</span>
+      </td>
+      <td><span [ngClass]="v.active ? 'badge active' : 'badge'">{{ v.active ? 'Áp dụng' : 'Tắt' }}</span></td>
+      <td class="actions">
+        <button class="btn ghost" (click)="edit(v)">Sửa</button>
+        <button class="btn ghost" (click)="remove(v)">Xoá</button>
+      </td>
+    </tr>
+    <tr *ngIf="vouchers.length === 0"><td colspan="8" class="muted">Chưa có voucher.</td></tr>
+  </tbody>
+</table>
