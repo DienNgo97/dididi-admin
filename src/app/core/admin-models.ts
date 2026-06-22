@@ -36,6 +36,9 @@ export interface AdminBooking {
   travelDate?: string;
   providerConfirmation?: string;
   createdAt?: string;
+  cancelStatus?: string;
+  cancelReason?: string;
+  cancelAdminNote?: string;
 }
 
 export interface Refund {
@@ -87,6 +90,8 @@ export interface AdminReview {
   vendorReply?: string;
   vendorReplyAt?: string;
   createdAt?: string;
+  images?: string[];
+  replyImages?: string[];
 }
 
 export interface AuditLog {
@@ -246,4 +251,37 @@ export interface VoucherUpsert {
   validFrom?: string | null;
   validTo?: string | null;
   active: boolean;
+}
+
+// ===== Lịch sử chat hỗ trợ (chatbot) =====
+export interface SupportStats {
+  totalMessages: number;
+  totalQuestions: number;
+  totalConversations: number;
+  escalatedConversations: number;
+  escalationRate: number;
+  kbAnswers: number;
+  llmAnswers: number;
+  unresolvedAnswers: number;
+  agentMessages: number;
+}
+
+export interface SupportConversation {
+  conversationId: string;
+  messageCount: number;
+  startedAt: string;
+  lastAt: string;
+  escalated: boolean;
+  userId: number | null;
+}
+
+export interface SupportChatMessage {
+  id: number;
+  role: string;
+  content: string;
+  source: string | null;
+  escalated: boolean;
+  bookingCode: string | null;
+  userId: number | null;
+  createdAt: string;
 }

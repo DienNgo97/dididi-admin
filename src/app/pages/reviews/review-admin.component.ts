@@ -37,7 +37,7 @@ export class ReviewAdminComponent implements OnInit {
     this.busy = r.id;
     this.reviewService.publish(r.id).subscribe({
       next: () => { this.busy = 0; this.load(); },
-      error: (err) => { this.busy = 0; alert(err?.error?.message || 'Thao tác thất bại'); }
+      error: (err) => { this.busy = 0; (window as any).appAlert(err?.error?.message || 'Thao tác thất bại'); }
     });
   }
 
@@ -45,16 +45,16 @@ export class ReviewAdminComponent implements OnInit {
     this.busy = r.id;
     this.reviewService.hide(r.id).subscribe({
       next: () => { this.busy = 0; this.load(); },
-      error: (err) => { this.busy = 0; alert(err?.error?.message || 'Thao tác thất bại'); }
+      error: (err) => { this.busy = 0; (window as any).appAlert(err?.error?.message || 'Thao tác thất bại'); }
     });
   }
 
-  remove(r: AdminReview): void {
-    if (!confirm('Xoá hẳn đánh giá #' + r.id + '?')) { return; }
+  async remove(r: AdminReview): Promise<void> {
+    if (!await (window as any).appConfirm('Xoá hẳn đánh giá #' + r.id + '?')) { return; }
     this.busy = r.id;
     this.reviewService.remove(r.id).subscribe({
       next: () => { this.busy = 0; this.load(); },
-      error: (err) => { this.busy = 0; alert(err?.error?.message || 'Xoá thất bại'); }
+      error: (err) => { this.busy = 0; (window as any).appAlert(err?.error?.message || 'Xoá thất bại'); }
     });
   }
 }

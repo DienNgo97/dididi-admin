@@ -27,6 +27,11 @@
   <select [ngModel]="role" (ngModelChange)="role = $event; onFilterChange()">
     <option *ngFor="let r of roles" [value]="r">{{ r || 'Tất cả' }}</option>
   </select>
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+  </select>
 </div>
 
 <p class="muted" *ngIf="loading">Đang tải...</p>

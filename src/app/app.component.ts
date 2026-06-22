@@ -10,6 +10,15 @@ import { AuthService } from './core/auth.service';
 export class AppComponent {
   constructor(public auth: AuthService, private router: Router) {}
 
+  /** 2 chữ cái đầu cho avatar, suy ra từ email. */
+  get initials(): string {
+    const email = this.auth.email || '';
+    const name = email.split('@')[0] || '';
+    const parts = name.split(/[._-]+/).filter(Boolean);
+    const s = parts.length >= 2 ? parts[0][0] + parts[1][0] : name.slice(0, 2);
+    return (s || 'AD').toUpperCase();
+  }
+
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);

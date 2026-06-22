@@ -53,18 +53,39 @@
   </div>
 </div>
 
+<div class="filters" style="flex-wrap:wrap;gap:12px">
+  <label class="muted">Loại:</label>
+  <select [ngModel]="typeFilter" (ngModelChange)="typeFilter = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option value="dididi">Voucher Dididi</option>
+    <option value="point">Đổi điểm (PT-)</option>
+  </select>
+
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="statusFilter" (ngModelChange)="statusFilter = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option value="active">Đang áp dụng</option>
+    <option value="expired">Hết hạn</option>
+    <option value="scheduled">Chưa hiệu lực</option>
+    <option value="off">Tắt</option>
+  </select>
+
+  <button class="btn ghost" *ngIf="typeFilter || statusFilter" (click)="typeFilter=''; statusFilter=''; onFilterChange()">Xoá lọc</button>
+</div>
+
 <p class="muted" *ngIf="loading">Đang tải...</p>
 
 <table class="tbl" *ngIf="!loading">
   <thead>
     <tr>
-      <th>Mã</th><th>Mô tả</th><th>Giảm</th><th>Đơn tối thiểu</th>
+      <th>Mã</th><th>Loại</th><th>Mô tả</th><th>Giảm</th><th>Đơn tối thiểu</th>
       <th>Giới hạn (tổng / người)</th><th>Hiệu lực</th><th>Trạng thái</th><th></th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let v of vouchers">
+    <tr *ngFor="let v of pageVouchers">
       <td><b>{{ v.code }}</b></td>
+      <td>{{ isPoint(v) ? 'Đổi điểm' : 'Dididi' }}</td>
       <td class="muted">{{ v.description }}</td>
       <td>
         <span *ngIf="v.discountType === 'PERCENT'">{{ v.discountValue }}%<span *ngIf="v.maxDiscount" class="muted"> (tối đa {{ v.maxDiscount | number }}đ)</span></span>
@@ -77,12 +98,18 @@
         <span *ngIf="v.validTo">→ {{ v.validTo | slice:0:10 }}</span>
         <span *ngIf="!v.validFrom && !v.validTo" class="muted">không giới hạn</span>
       </td>
-      <td><span [ngClass]="v.active ? 'badge active' : 'badge'">{{ v.active ? 'Áp dụng' : 'Tắt' }}</span></td>
+      <td><span [ngClass]="statusKey(v) === 'active' ? 'badge active' : 'badge'">{{ statusText(v) }}</span></td>
       <td class="actions">
         <button class="btn ghost" (click)="edit(v)">Sửa</button>
         <button class="btn ghost" (click)="remove(v)">Xoá</button>
       </td>
     </tr>
-    <tr *ngIf="vouchers.length === 0"><td colspan="8" class="muted">Chưa có voucher.</td></tr>
+    <tr *ngIf="pageVouchers.length === 0"><td colspan="9" class="muted">Không có voucher phù hợp.</td></tr>
   </tbody>
 </table>
+
+<div class="pager" *ngIf="!loading && filtered.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ filtered.length }} voucher</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>

@@ -47,9 +47,12 @@ export class ReviewService {
       .pipe(map((r) => r.data));
   }
 
-  reply(id: number, text: string): Observable<unknown> {
+  reply(id: number, text: string, files?: File[]): Observable<unknown> {
+    const fd = new FormData();
+    fd.append('reply', text);
+    (files || []).forEach((f) => fd.append('images', f));
     return this.http
-      .post<ApiResponse<unknown>>(`${this.vendorBase}/${id}/reply`, { reply: text })
+      .post<ApiResponse<unknown>>(`${this.vendorBase}/${id}/reply`, fd)
       .pipe(map((r) => r.data));
   }
 }

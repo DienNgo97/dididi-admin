@@ -1,0 +1,56 @@
+<div class="page-head"><h1>Báo cáo tồn kho</h1></div>
+
+<div class="card" style="margin-bottom:14px;display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+  <div>
+    <label class="muted" style="display:block">Từ ngày</label>
+    <input type="date" [(ngModel)]="from" style="padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+  </div>
+  <div>
+    <label class="muted" style="display:block">Đến ngày</label>
+    <input type="date" [(ngModel)]="to" style="padding:8px;border:1px solid #cdd3dd;border-radius:8px"/>
+  </div>
+  <button class="btn" (click)="load()">Xem</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<div *ngIf="!loading && data">
+  <div class="card">
+    <h2 style="margin:0 0 4px">Công suất theo loại phòng</h2>
+    <p class="muted" style="margin:0 0 8px">{{ data.from }} → {{ data.to }} ({{ data.days }} ngày)</p>
+    <app-bar-chart [data]="occChart" unit="%" color="#2f8b60" [height]="180"></app-bar-chart>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Loại phòng</th><th>Tổng phòng</th><th>Phòng-đêm đã đặt</th>
+          <th>Sức chứa (phòng-đêm)</th><th>Công suất</th><th>Ngày hết phòng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of data.rooms">
+          <td><b>{{ r.name }}</b></td>
+          <td>{{ r.totalRooms }}</td>
+          <td>{{ r.roomNightsBooked }}</td>
+          <td>{{ r.roomNightsCapacity }}</td>
+          <td><b [style.color]="r.occupancyPct >= 80 ? '#c0392b' : (r.occupancyPct >= 50 ? '#9a6a00' : '#1b7a43')">{{ r.occupancyPct | number:'1.0-1' }}%</b></td>
+          <td>{{ r.soldOutDays }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted" *ngIf="!data.rooms.length">Khách sạn chưa có loại phòng nào.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px" *ngIf="anyLow()">
+    <h2 style="margin:0 0 8px">Ngày sắp hết phòng (còn ≤ 2 phòng)</h2>
+    <div *ngFor="let r of data.rooms">
+      <div *ngIf="r.lowDays.length" style="margin-bottom:8px">
+        <b>{{ r.name }}:</b>
+        <span class="badge" style="background:#fff3da;color:#9a6a00;margin:2px" *ngFor="let d of r.lowDays">{{ d }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,6 +12,7 @@ export class UserListComponent implements OnInit {
   page = 0;
   size = 20;
   role = '';
+  status = '';
   loading = false;
   error = '';
   roles = ['', 'CUSTOMER', 'VENDOR', 'ADMIN', 'SUPER_ADMIN'];
@@ -29,7 +30,7 @@ export class UserListComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
-    this.userService.list(this.page, this.size, this.role || undefined).subscribe({
+    this.userService.list(this.page, this.size, this.role || undefined, this.status || undefined).subscribe({
       next: (d) => { this.data = d; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được danh sách'; this.loading = false; }
     });
@@ -44,7 +45,7 @@ export class UserListComponent implements OnInit {
     u.status = status;
     this.userService.changeStatus(u.id, status).subscribe({
       next: (updated) => { u.status = updated.status; },
-      error: (err) => { u.status = prev; alert(err?.error?.message || 'Đổi trạng thái thất bại'); }
+      error: (err) => { u.status = prev; (window as any).appAlert(err?.error?.message || 'Đổi trạng thái thất bại'); }
     });
   }
 
@@ -53,14 +54,14 @@ export class UserListComponent implements OnInit {
     u.role = role;
     this.userService.changeRole(u.id, role).subscribe({
       next: (updated) => { u.role = updated.role; },
-      error: (err) => { u.role = prev; alert(err?.error?.message || 'Đổi vai trò thất bại'); }
+      error: (err) => { u.role = prev; (window as any).appAlert(err?.error?.message || 'Đổi vai trò thất bại'); }
     });
   }
 
   createAdmin(): void {
     this.createMsg = '';
     if (!this.newUser.email || !this.newUser.password || this.newUser.password.length < 6) {
-      alert('Cần email và mật khẩu tối thiểu 6 ký tự');
+      (window as any).appAlert('Cần email và mật khẩu tối thiểu 6 ký tự');
       return;
     }
     this.creating = true;
@@ -72,7 +73,7 @@ export class UserListComponent implements OnInit {
         this.page = 0;
         this.load();
       },
-      error: (err) => { this.creating = false; alert(err?.error?.message || 'Tạo tài khoản thất bại'); }
+      error: (err) => { this.creating = false; (window as any).appAlert(err?.error?.message || 'Tạo tài khoản thất bại'); }
     });
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommissionService } from '../../api/commission.service';
 import { UserService } from '../../api/user.service';
-import { CommissionConfig, VendorCommission, CommissionReport, AdminUser } from '../../core/admin-models';
+import { CommissionConfig, VendorCommission, CommissionReport, CommissionReportRow, AdminUser } from '../../core/admin-models';
 
 @Component({
   selector: 'app-commission',
@@ -12,6 +12,9 @@ export class CommissionComponent implements OnInit {
   defaultPercent = 0;
   vendors: VendorCommission[] = [];
   report?: CommissionReport;
+  reportRows: CommissionReportRow[] = [];   // dòng của trang hiện tại (báo cáo hoa hồng)
+  reportPage = 0;
+  readonly reportPageSize = 20;
   vendorOptions: AdminUser[] = [];
   selVendorId: number | null = null;
   selVendorPercent: number | null = null;
@@ -32,8 +35,27 @@ export class CommissionComponent implements OnInit {
       error: (e) => { this.error = e?.error?.message || 'Không tải được cấu hình'; }
     });
     this.commission.vendors().subscribe({ next: (v) => { this.vendors = v; } });
-    this.commission.report().subscribe({ next: (r) => { this.report = r; } });
+    this.commission.report().subscribe({
+      next: (r) => { this.report = r; this.reportPage = 0; this.applyReportPage(); }
+    });
   }
+
+  // ---- Phân trang client-side cho bảng "Báo cáo hoa hồng" (20 vendor/trang) ----
+  get reportTotalPages(): number {
+    const n = this.report?.rows.length ?? 0;
+    return Math.max(1, Math.ceil(n / this.reportPageSize));
+  }
+
+  private applyReportPage(): void {
+    const rows = this.report?.rows ?? [];
+    const maxPage = this.reportTotalPages - 1;
+    if (this.reportPage > maxPage) { this.reportPage = maxPage; }
+    const start = this.reportPage * this.reportPageSize;
+    this.reportRows = rows.slice(start, start + this.reportPageSize);
+  }
+
+  reportPrev(): void { if (this.reportPage > 0) { this.reportPage--; this.applyReportPage(); } }
+  reportNext(): void { if (this.reportPage + 1 < this.reportTotalPages) { this.reportPage++; this.applyReportPage(); } }
 
   saveDefault(): void {
     this.error = ''; this.msg = '';
@@ -48,15 +70,15 @@ export class CommissionComponent implements OnInit {
     if (!this.selVendorId || this.selVendorPercent == null) { return; }
     this.commission.setVendor(this.selVendorId, this.selVendorPercent / 100).subscribe({
       next: () => { this.selVendorId = null; this.selVendorPercent = null; this.loadAll(); },
-      error: (e) => alert(e?.error?.message || 'Đặt thất bại')
+      error: (e) => (window as any).appAlert(e?.error?.message || 'Đặt thất bại')
     });
   }
 
-  removeVendor(v: VendorCommission): void {
-    if (!confirm('Gỡ hoa hồng riêng của vendor này (về dùng mặc định)?')) { return; }
+  async removeVendor(v: VendorCommission): Promise<void> {
+    if (!await (window as any).appConfirm('Gỡ hoa hồng riêng của vendor này (về dùng mặc định)?')) { return; }
     this.commission.removeVendor(v.vendorId).subscribe({
       next: () => this.loadAll(),
-      error: (e) => alert(e?.error?.message || 'Gỡ thất bại')
+      error: (e) => (window as any).appAlert(e?.error?.message || 'Gỡ thất bại')
     });
   }
 

@@ -44,7 +44,7 @@
   <table class="tbl" *ngIf="report">
     <thead><tr><th>Vendor</th><th>Số đơn</th><th>Doanh thu</th><th>Tỷ lệ</th><th>Hoa hồng</th><th>Net trả vendor</th></tr></thead>
     <tbody>
-      <tr *ngFor="let r of report.rows">
+      <tr *ngFor="let r of reportRows">
         <td>{{ r.vendorName }}</td>
         <td>{{ r.bookingCount }}</td>
         <td>{{ r.gross | number }} đ</td>
@@ -63,4 +63,11 @@
       </tr>
     </tfoot>
   </table>
+
+  <div class="filters" style="margin-top:10px;gap:8px;align-items:center"
+       *ngIf="report && report.rows.length > reportPageSize">
+    <button class="btn" (click)="reportPrev()" [disabled]="reportPage === 0">‹ Trước</button>
+    <span class="muted">Trang {{ reportPage + 1 }}/{{ reportTotalPages }} · {{ report.rows.length }} vendor</span>
+    <button class="btn" (click)="reportNext()" [disabled]="reportPage + 1 >= reportTotalPages">Sau ›</button>
+  </div>
 </div>

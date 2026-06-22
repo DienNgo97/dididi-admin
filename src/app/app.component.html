@@ -1,30 +1,110 @@
-<header class="topnav">
-  <a class="brand" [routerLink]="auth.role === 'VENDOR' ? '/vendor' : '/dashboard'">Dididi Admin</a>
-  <nav *ngIf="auth.isLoggedIn() && auth.role !== 'VENDOR'">
-    <a routerLink="/dashboard" routerLinkActive="active">Tổng quan</a>
-    <a routerLink="/hotels" routerLinkActive="active">Khách sạn</a>
-    <a routerLink="/flights" routerLinkActive="active">Chuyến bay</a>
-    <a routerLink="/bookings" routerLinkActive="active">Đơn đặt</a>
-    <a routerLink="/users" routerLinkActive="active">Người dùng</a>
-    <a routerLink="/vendors" routerLinkActive="active">Vendors</a>
-    <a routerLink="/companies" routerLinkActive="active">Công ty</a>
-    <a routerLink="/vouchers" routerLinkActive="active">Voucher</a>
-    <a routerLink="/approvals" routerLinkActive="active">Phê duyệt</a>
-    <a routerLink="/reviews" routerLinkActive="active">Đánh giá</a>
-    <a routerLink="/audit" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Audit</a>
-    <a routerLink="/commission" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Hoa hồng</a>
-    <a routerLink="/payment-gateway" routerLinkActive="active" *ngIf="auth.role === 'SUPER_ADMIN'">Cổng TT</a>
-  </nav>
-  <nav *ngIf="auth.isLoggedIn() && auth.role === 'VENDOR'">
-    <a routerLink="/vendor" routerLinkActive="active">Khách sạn của tôi</a>
-    <a routerLink="/vendor/reviews" routerLinkActive="active">Đánh giá</a>
-  </nav>
-  <span class="sp"></span>
-  <span class="user" *ngIf="auth.isLoggedIn()">
-    {{ auth.email }} <em>({{ auth.role }})</em>
-    <button class="btn ghost" (click)="logout()">Đăng xuất</button>
-  </span>
-</header>
-<main class="content">
-  <router-outlet></router-outlet>
-</main>
+<div class="layout">
+  <aside class="sidebar" *ngIf="auth.isLoggedIn()">
+    <a class="brand" [routerLink]="auth.role === 'VENDOR' ? '/vendor' : '/dashboard'">
+      <span class="logo">
+        <svg viewBox="0 0 24 24" fill="#0f2a1e"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+      </span>
+      <span><b>Dididi</b><small>Admin</small></span>
+    </a>
+
+    <nav *ngIf="auth.role !== 'VENDOR'">
+      <div class="nav-sec">Tổng quan</div>
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Tổng quan</span>
+      </a>
+
+      <div class="nav-sec">Quản lý</div>
+      <a routerLink="/hotels" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8m0 4h18m0 6V11a3 3 0 0 0-3-3H7"/><circle cx="7.5" cy="11.5" r="1.3"/></svg>
+        <span>Khách sạn</span>
+      </a>
+      <a routerLink="/flights" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+        <span>Chuyến bay</span>
+      </a>
+      <a routerLink="/bookings" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 4h8v3H8z"/><path d="M8 11h8M8 15h6"/></svg>
+        <span>Đơn đặt</span>
+      </a>
+      <a routerLink="/users" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.7"/><path d="M16.5 14.2A5.5 5.5 0 0 1 20.5 19.5"/></svg>
+        <span>Người dùng</span>
+      </a>
+      <a routerLink="/vendors" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7"/><path d="M3 12h18"/></svg>
+        <span>Vendors</span>
+      </a>
+      <a routerLink="/companies" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 7h2M8 11h2M8 15h2M14 7h2M14 11h2M14 15h2"/></svg>
+        <span>Công ty</span>
+      </a>
+      <a routerLink="/vouchers" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2 2 2 0 0 0 0-4z"/><path d="M15 7.5v9"/></svg>
+        <span>Voucher</span>
+      </a>
+      <a routerLink="/approvals" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5 11 15l5-5.5"/></svg>
+        <span>Phê duyệt</span>
+      </a>
+      <a routerLink="/reviews" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 14.6 9l6 .5-4.5 4 1.4 5.9L12 16.3 6.5 19.4 7.9 13.5 3.4 9.5l6-.5z"/></svg>
+        <span>Đánh giá</span>
+      </a>
+
+      <div class="nav-sec">Phân tích</div>
+      <a routerLink="/reports" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        <span>Báo cáo</span>
+      </a>
+      <a routerLink="/support-log" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></svg>
+        <span>Chat hỗ trợ</span>
+      </a>
+
+      <ng-container *ngIf="auth.role === 'SUPER_ADMIN'">
+        <div class="nav-sec">Hệ thống</div>
+        <a routerLink="/audit" routerLinkActive="active">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v3h3"/><path d="M12 8v4.5l3 1.8"/></svg>
+          <span>Audit</span>
+        </a>
+        <a routerLink="/commission" routerLinkActive="active">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5 5 19"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+          <span>Hoa hồng</span>
+        </a>
+        <a routerLink="/payment-gateway" routerLinkActive="active">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9.5h19M6 15h4"/></svg>
+          <span>Cổng TT</span>
+        </a>
+      </ng-container>
+    </nav>
+
+    <nav *ngIf="auth.role === 'VENDOR'">
+      <div class="nav-sec">Vendor</div>
+      <a routerLink="/vendor" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8m0 4h18m0 6V11a3 3 0 0 0-3-3H7"/><circle cx="7.5" cy="11.5" r="1.3"/></svg>
+        <span>Khách sạn của tôi</span>
+      </a>
+      <a routerLink="/vendor/reviews" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 14.6 9l6 .5-4.5 4 1.4 5.9L12 16.3 6.5 19.4 7.9 13.5 3.4 9.5l6-.5z"/></svg>
+        <span>Đánh giá</span>
+      </a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="avatar">{{ initials }}</div>
+      <div class="who">
+        <b>{{ auth.email }}</b>
+        <span class="role-badge">{{ auth.role }}</span>
+      </div>
+      <button class="logout" (click)="logout()" title="Đăng xuất" aria-label="Đăng xuất">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+<app-confirm-dialog></app-confirm-dialog>

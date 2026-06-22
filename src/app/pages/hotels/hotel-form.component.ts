@@ -20,7 +20,7 @@ export class HotelFormComponent implements OnInit {
     if (idParam) {
       this.id = Number(idParam);
       this.hotelService.get(this.id).subscribe({
-        next: (h) => { this.model = { ...h, active: true }; },
+        next: (h) => { this.model = { ...h }; },   // dùng đúng active load về (không ép = true)
         error: (err) => { this.error = err?.error?.message || 'Không tải được khách sạn'; }
       });
     }
