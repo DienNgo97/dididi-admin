@@ -21,7 +21,7 @@ export class LoginComponent {
       next: (res) => {
         this.loading = false;
         if (res.role === 'VENDOR') {
-          this.router.navigate(['/vendor']);
+          this.router.navigate(['/vendor/dashboard']);
         } else if (res.role === 'ADMIN' || res.role === 'SUPER_ADMIN') {
           this.router.navigate(['/dashboard']);
         } else {

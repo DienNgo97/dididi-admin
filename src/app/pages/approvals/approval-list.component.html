@@ -1,26 +1,54 @@
 <div class="page-head"><h1>Phê duyệt đặt B2B</h1></div>
 
+<div class="tabs">
+  <button *ngFor="let t of tabs"
+          class="tab" [class.active]="activeTab === t.key"
+          (click)="selectTab(t.key)">{{ t.label }}</button>
+</div>
+
 <div class="err" *ngIf="error">{{ error }}</div>
-<div *ngIf="msg" style="color:#2e7d32;margin-bottom:10px">{{ msg }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin:10px 0">{{ msg }}</div>
 <p class="muted" *ngIf="loading">Đang tải...</p>
 
 <table class="tbl" *ngIf="!loading">
   <thead>
-    <tr><th>Mã đơn</th><th>Tiêu đề</th><th>Công ty</th><th>Người đặt</th><th>Số tiền</th><th>Tạo lúc</th><th></th></tr>
+    <tr>
+      <th>Mã đơn</th>
+      <th>Tiêu đề</th>
+      <th>Công ty</th>
+      <th>Người đặt</th>
+      <th>Số tiền</th>
+      <th>Tạo lúc</th>
+      <th *ngIf="activeTab === 'REJECTED'">Lý do từ chối</th>
+      <th *ngIf="activeTab === 'PENDING'"></th>
+    </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let r of items">
+    <tr *ngFor="let r of pageItems">
       <td>{{ r.bookingCode }}</td>
       <td>{{ r.bookingTitle }}</td>
       <td>{{ r.companyName }}</td>
       <td>{{ r.requestedByEmail }}</td>
       <td>{{ r.amount | number }} đ</td>
       <td>{{ r.createdAt }}</td>
-      <td class="actions">
+      <td *ngIf="activeTab === 'REJECTED'">{{ r.decisionNote || '—' }}</td>
+      <td class="actions" *ngIf="activeTab === 'PENDING'">
         <button class="btn" (click)="approve(r)" [disabled]="busyId === r.id">Duyệt</button>
         <button class="btn danger" (click)="reject(r)" [disabled]="busyId === r.id">Từ chối</button>
       </td>
     </tr>
-    <tr *ngIf="items.length === 0"><td colspan="7" class="muted">Không có yêu cầu chờ duyệt.</td></tr>
+    <tr *ngIf="items.length === 0">
+      <td [attr.colspan]="(activeTab === 'PENDING' || activeTab === 'REJECTED') ? 7 : 6" class="muted">
+        {{ activeTab === 'PENDING' ? 'Không có yêu cầu chờ duyệt.'
+           : activeTab === 'APPROVED' ? 'Chưa có yêu cầu nào được duyệt.'
+           : 'Chưa có yêu cầu nào bị từ chối.' }}
+      </td>
+    </tr>
   </tbody>
 </table>
+
+<div class="pager" *ngIf="!loading && items.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ items.length }} yêu cầu</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>

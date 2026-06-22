@@ -13,7 +13,15 @@ export class AuditLogComponent implements OnInit {
   action = '';
   loading = false;
   error = '';
-  actions = ['', 'REFUND', 'BAN_VENDOR', 'UNBAN_VENDOR'];
+  // Đầy đủ các action thực tế được ghi audit ở backend (xem các nơi publish AuditEvent).
+  actions = [
+    '', 'LOGIN',
+    'APPROVE_VENDOR', 'REJECT_VENDOR', 'BAN_VENDOR', 'UNBAN_VENDOR',
+    'CREATE_USER', 'CHANGE_USER_STATUS', 'CHANGE_USER_ROLE',
+    'CHANGE_COMMISSION_DEFAULT', 'CHANGE_COMMISSION_VENDOR', 'REMOVE_COMMISSION_VENDOR',
+    'CHANGE_PAYMENT_GATEWAY', 'REFUND',
+    'APPROVE_CORP_BOOKING', 'REJECT_CORP_BOOKING'
+  ];
 
   constructor(private auditService: AuditService) {}
 

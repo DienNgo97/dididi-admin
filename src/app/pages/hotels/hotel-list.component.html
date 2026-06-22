@@ -4,6 +4,29 @@
 </div>
 
 <div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters" style="flex-wrap:wrap;gap:12px">
+  <label class="muted">Hạng sao:</label>
+  <select [ngModel]="star" (ngModelChange)="star = $event; onFilterChange()"
+          style="padding:8px;border:1px solid #cdd3dd;border-radius:8px">
+    <option value="">Tất cả</option>
+    <option value="5">5 sao</option>
+    <option value="4">4 sao</option>
+    <option value="3">3 sao</option>
+    <option value="2">2 sao</option>
+    <option value="1">1 sao</option>
+  </select>
+
+  <label class="muted">Thành phố:</label>
+  <select [ngModel]="city" (ngModelChange)="city = $event; onFilterChange()"
+          style="padding:8px;border:1px solid #cdd3dd;border-radius:8px">
+    <option value="">Tất cả</option>
+    <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+  </select>
+
+  <button class="btn ghost" *ngIf="star || city" (click)="clearFilters()">Xoá lọc</button>
+</div>
+
 <p class="muted" *ngIf="loading">Đang tải...</p>
 
 <table class="tbl" *ngIf="!loading">
@@ -11,17 +34,25 @@
     <tr><th>ID</th><th>Tên</th><th>Thành phố</th><th>Hạng</th><th>Giá từ</th><th></th></tr>
   </thead>
   <tbody>
-    <tr *ngFor="let h of hotels">
+    <tr *ngFor="let h of pageHotels">
       <td>{{ h.id }}</td>
       <td>{{ h.name }}</td>
       <td>{{ h.city }}</td>
-      <td>{{ h.starRating }}</td>
-      <td>{{ h.minPrice }} {{ h.currency }}</td>
+      <td>{{ h.starRating }}★</td>
+      <td>{{ h.minPrice | number:'1.0-0' }} {{ h.currency }}</td>
       <td class="actions">
         <button class="btn ghost" (click)="edit(h)">Sửa</button>
         <button class="btn danger" (click)="remove(h)">Xoá</button>
       </td>
     </tr>
-    <tr *ngIf="hotels.length === 0"><td colspan="6" class="muted">Chưa có khách sạn.</td></tr>
+    <tr *ngIf="pageHotels.length === 0">
+      <td colspan="6" class="muted">Không có khách sạn phù hợp.</td>
+    </tr>
   </tbody>
 </table>
+
+<div class="pager" *ngIf="!loading && filtered.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ filtered.length }} khách sạn</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>

@@ -1,0 +1,60 @@
+<div class="page-head"><h1>Báo cáo</h1></div>
+
+<div class="filters">
+  <label>
+    Loại báo cáo
+    <select [(ngModel)]="metric" (change)="load()">
+      <option *ngFor="let m of metrics" [value]="m.key">{{ m.label }}</option>
+    </select>
+  </label>
+  <label>
+    Kỳ
+    <select [(ngModel)]="gran" (change)="load()">
+      <option *ngFor="let g of grans" [value]="g.key">{{ g.label }}</option>
+    </select>
+  </label>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<ng-container *ngIf="!loading && data">
+  <div class="cards">
+    <div class="card">
+      <div class="k">{{ totalLabel }}</div>
+      <div class="v" *ngIf="isRevenue">{{ (data.totalRevenue || 0) | number }} ₫</div>
+      <div class="v" *ngIf="!isRevenue">{{ data.totalCount | number }}</div>
+    </div>
+    <div class="card" *ngIf="isRevenue">
+      <div class="k">Tổng số đơn</div>
+      <div class="v">{{ data.totalCount | number }}</div>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart" *ngIf="maxValue > 0">
+      <div class="bar-col" *ngFor="let p of data.series">
+        <div class="bar-wrap">
+          <div class="bar" [style.height.%]="pct(p)" [attr.title]="barTitle(p)"></div>
+        </div>
+        <div class="bar-label">{{ p.label }}</div>
+      </div>
+    </div>
+    <p class="muted" *ngIf="maxValue === 0">Chưa có dữ liệu trong kỳ này.</p>
+  </div>
+
+  <table class="tbl">
+    <thead>
+      <tr *ngIf="isRevenue"><th>Kỳ</th><th>Doanh thu</th><th>Số đơn</th></tr>
+      <tr *ngIf="!isRevenue"><th>Kỳ</th><th>Số lượng</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of data.series">
+        <td>{{ p.label }}</td>
+        <td *ngIf="isRevenue">{{ (p.revenue || 0) | number }} ₫</td>
+        <td *ngIf="isRevenue">{{ p.count | number }}</td>
+        <td *ngIf="!isRevenue">{{ p.count | number }}</td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

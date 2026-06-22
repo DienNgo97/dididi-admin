@@ -11,9 +11,10 @@ export class BookingService {
   private base = `${API_BASE}/api/admin/v1/bookings`;
   constructor(private http: HttpClient) {}
 
-  list(page = 0, size = 20, status?: string): Observable<PagedResponse<AdminBooking>> {
+  list(page = 0, size = 20, status?: string, cancelStatus?: string): Observable<PagedResponse<AdminBooking>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
+    if (cancelStatus) { params = params.set('cancelStatus', cancelStatus); }
     return this.http
       .get<ApiResponse<PagedResponse<AdminBooking>>>(this.base, { params })
       .pipe(map((r) => r.data));
@@ -28,6 +29,18 @@ export class BookingService {
   refund(id: number, reason?: string): Observable<AdminBooking> {
     return this.http
       .post<ApiResponse<AdminBooking>>(`${this.base}/${id}/refund`, { reason: reason || '' })
+      .pipe(map((r) => r.data));
+  }
+
+  approveCancel(id: number, reason: string): Observable<AdminBooking> {
+    return this.http
+      .post<ApiResponse<AdminBooking>>(`${this.base}/${id}/cancel-request/approve`, { reason })
+      .pipe(map((r) => r.data));
+  }
+
+  rejectCancel(id: number, reason: string): Observable<AdminBooking> {
+    return this.http
+      .post<ApiResponse<AdminBooking>>(`${this.base}/${id}/cancel-request/reject`, { reason })
       .pipe(map((r) => r.data));
   }
 

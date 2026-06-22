@@ -1,0 +1,77 @@
+<div class="page-head"><h1>Báo cáo doanh thu</h1></div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+  <button *ngFor="let t of tabs" (click)="select(t.key)"
+          [class]="active === t.key ? 'btn' : 'btn ghost'">{{ t.label }}</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<div *ngIf="!loading && data">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+    <div class="card"><div class="k">Tổng doanh thu</div>
+      <div style="font-size:21px;font-weight:700;color:#3dac78">{{ data.totalRevenue | number:'1.0-0' }} ₫</div></div>
+    <div class="card"><div class="k">Số đơn</div>
+      <div style="font-size:21px;font-weight:700">{{ data.bookingCount }}</div></div>
+    <div class="card"><div class="k">Số phòng-đêm</div>
+      <div style="font-size:21px;font-weight:700">{{ data.roomNights }}</div></div>
+    <div class="card"><div class="k">DT trung bình/đơn</div>
+      <div style="font-size:21px;font-weight:700">{{ data.avgOrderValue | number:'1.0-0' }} ₫</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 8px">Biểu đồ doanh thu</h2>
+    <app-bar-chart [data]="revChart" unit="₫" [height]="200"></app-bar-chart>
+    <table class="tbl">
+      <thead><tr><th>Kỳ</th><th>Doanh thu</th><th>Số đơn</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let s of data.series">
+          <td>{{ s.label }}</td>
+          <td>{{ s.revenue | number:'1.0-0' }} ₫</td>
+          <td>{{ s.bookings }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 8px">Doanh thu theo loại phòng</h2>
+    <app-bar-chart [data]="roomChart" unit="₫" [height]="160"></app-bar-chart>
+    <table class="tbl" *ngIf="data.byRoomType.length">
+      <thead><tr><th>Loại phòng</th><th>Số đơn</th><th>Doanh thu</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let r of data.byRoomType">
+          <td>{{ r.name }}</td>
+          <td>{{ r.bookings }}</td>
+          <td>{{ r.revenue | number:'1.0-0' }} ₫</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted" *ngIf="!data.byRoomType.length">Chưa có dữ liệu.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <h2 style="margin:0">Sở thích nhóm khách → loại phòng</h2>
+      <div style="display:flex;gap:6px">
+        <button (click)="groupMode='TIER'" [class]="groupMode==='TIER' ? 'btn' : 'btn ghost'" style="padding:6px 12px">Theo hạng thành viên</button>
+        <button (click)="groupMode='SEGMENT'" [class]="groupMode==='SEGMENT' ? 'btn' : 'btn ghost'" style="padding:6px 12px">Khách lẻ / Doanh nghiệp</button>
+      </div>
+    </div>
+    <p class="muted" style="margin:6px 0">Số lượt đặt của mỗi nhóm theo từng loại phòng (ô lớn nhất mỗi hàng = loại phòng nhóm đó ưa nhất).</p>
+    <table class="tbl" *ngIf="pref && pref.rows.length">
+      <thead>
+        <tr><th>Nhóm khách</th><th *ngFor="let rt of pref.roomTypes">{{ rt }}</th><th>Tổng</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pref.rows">
+          <td><b>{{ row.group }}</b></td>
+          <td *ngFor="let c of row.counts">{{ c }}</td>
+          <td><b>{{ row.total }}</b></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted" *ngIf="!pref || !pref.rows.length">Chưa có dữ liệu.</p>
+  </div>
+</div>

@@ -2,7 +2,14 @@
 
 <div class="err" *ngIf="error">{{ error }}</div>
 
-<div class="filters">
+<div class="tabs" style="display:flex;gap:8px;margin-bottom:14px">
+  <button class="btn" [class.ghost]="tab !== 'all'" (click)="setTab('all')">Tất cả đơn</button>
+  <button class="btn" [class.ghost]="tab !== 'cancel'" (click)="setTab('cancel')">
+    Yêu cầu huỷ<span *ngIf="pendingCancelCount > 0"> ({{ pendingCancelCount }})</span>
+  </button>
+</div>
+
+<div class="filters" *ngIf="tab === 'all'">
   <label class="muted">Trạng thái:</label>
   <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
     <option *ngFor="let s of statuses" [value]="s">{{ s || 'Tất cả' }}</option>
@@ -13,7 +20,7 @@
 
 <table class="tbl" *ngIf="!loading && data">
   <thead>
-    <tr><th>Mã</th><th>User</th><th>Loại</th><th>Tiêu đề</th><th>Số tiền</th><th>Trạng thái</th><th></th></tr>
+    <tr><th>Mã</th><th>User</th><th>Loại</th><th>Tiêu đề</th><th>Số tiền</th><th>Trạng thái</th><th>Yêu cầu huỷ</th><th></th></tr>
   </thead>
   <tbody>
     <tr *ngFor="let b of data.content">
@@ -23,14 +30,21 @@
       <td>{{ b.title }}</td>
       <td>{{ b.amount | number }} {{ b.currency }}</td>
       <td><span [ngClass]="'badge ' + (b.status | lowercase)">{{ b.status }}</span></td>
+      <td>
+        <span *ngIf="b.cancelStatus && b.cancelStatus !== 'NONE'" [ngClass]="'badge ' + (b.cancelStatus | lowercase)">{{ b.cancelStatus }}</span>
+        <div class="muted" *ngIf="b.cancelStatus === 'REQUESTED' && b.cancelReason" style="font-size:12px">{{ b.cancelReason }}</div>
+        <div class="muted" *ngIf="b.cancelAdminNote" style="font-size:12px">Ghi chú: {{ b.cancelAdminNote }}</div>
+      </td>
       <td class="actions">
+        <button class="btn" *ngIf="b.cancelStatus === 'REQUESTED'" (click)="approveCancel(b)">Duyệt huỷ</button>
+        <button class="btn danger" *ngIf="b.cancelStatus === 'REQUESTED'" (click)="rejectCancel(b)">Từ chối</button>
         <button class="btn" *ngIf="b.status === 'CONFIRMED'" [disabled]="refunding === b.id" (click)="refund(b)">
           {{ refunding === b.id ? 'Đang hoàn...' : 'Hoàn tiền' }}
         </button>
-        <button class="btn danger" *ngIf="b.status !== 'CANCELLED'" (click)="cancel(b)">Huỷ</button>
+        <button class="btn danger" *ngIf="b.status !== 'CANCELLED'" (click)="cancel(b)">Huỷ (admin)</button>
       </td>
     </tr>
-    <tr *ngIf="data.content.length === 0"><td colspan="7" class="muted">Không có đơn.</td></tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="8" class="muted">{{ tab === 'cancel' ? 'Không có yêu cầu huỷ nào.' : 'Không có đơn.' }}</td></tr>
   </tbody>
 </table>
 
@@ -40,13 +54,13 @@
   <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
 </div>
 
-<div class="filters" style="margin-top:18px">
+<div class="filters" style="margin-top:18px" *ngIf="tab === 'all'">
   <button class="btn ghost" (click)="toggleHistory()">
     {{ showHistory ? 'Ẩn' : 'Xem' }} lịch sử hoàn tiền
   </button>
 </div>
 
-<table class="tbl" *ngIf="showHistory">
+<table class="tbl" *ngIf="showHistory && tab === 'all'">
   <thead>
     <tr><th>#</th><th>Booking ID</th><th>Số tiền</th><th>Lý do</th><th>Trạng thái</th><th>Người xử lý</th><th>Thời điểm</th></tr>
   </thead>

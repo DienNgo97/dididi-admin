@@ -24,6 +24,9 @@ import { HotelImageManagerComponent } from './pages/shared/hotel-image-manager.c
 import { CompanyListComponent } from './pages/companies/company-list.component';
 import { CompanyFormComponent } from './pages/companies/company-form.component';
 import { VoucherListComponent } from './pages/vouchers/voucher-list.component';
+import { AdminReportComponent } from './pages/reports/admin-report.component';
+import { SupportLogComponent } from './pages/support/support-log.component';
+import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
 @NgModule({
@@ -47,7 +50,10 @@ import { AuthInterceptor } from './core/auth.interceptor';
     CommissionComponent,
     PaymentGatewayComponent,
     ApprovalListComponent,
-    VoucherListComponent
+    VoucherListComponent,
+    AdminReportComponent,
+    SupportLogComponent,
+    ConfirmDialogComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],

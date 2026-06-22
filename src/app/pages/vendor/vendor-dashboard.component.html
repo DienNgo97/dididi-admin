@@ -1,0 +1,71 @@
+<div class="page-head"><h1>Tổng quan</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<div *ngIf="!loading && data">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+    <div class="card">
+      <div class="k">Doanh thu tháng này</div>
+      <div style="font-size:22px;font-weight:700;color:#3dac78">{{ data.thisMonthRevenue | number:'1.0-0' }} ₫</div>
+      <div class="muted" [style.color]="data.revenueChangePct >= 0 ? '#1b7a43' : '#c0392b'">
+        {{ data.revenueChangePct >= 0 ? '▲' : '▼' }} {{ data.revenueChangePct | number:'1.0-1' }}% so với tháng trước
+      </div>
+    </div>
+    <div class="card">
+      <div class="k">Số đơn tháng này</div>
+      <div style="font-size:22px;font-weight:700">{{ data.thisMonthBookings }}</div>
+      <div class="muted">TB {{ data.avgOrderValue | number:'1.0-0' }} ₫/đơn</div>
+    </div>
+    <div class="card">
+      <div class="k">Công suất 30 ngày tới</div>
+      <div style="font-size:22px;font-weight:700">{{ data.occupancyNext30Pct | number:'1.0-1' }}%</div>
+      <div class="muted">Phòng-đêm đã đặt / tổng</div>
+    </div>
+    <div class="card">
+      <div class="k">Đánh giá</div>
+      <div style="font-size:22px;font-weight:700"><span style="color:#f5a623">★</span> {{ data.avgRating | number:'1.0-1' }}</div>
+      <div class="muted">{{ data.reviewCount }} đánh giá ·
+        <span [style.color]="data.unansweredReviews > 0 ? '#c0392b' : '#6b7280'">{{ data.unansweredReviews }} chưa trả lời</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 8px">Doanh thu 30 ngày gần nhất</h2>
+    <app-bar-chart [data]="revChart" unit="₫" [height]="160"></app-bar-chart>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div class="card">
+      <h2 style="margin:0 0 8px">Sắp nhận phòng (7 ngày tới)</h2>
+      <table class="tbl" *ngIf="data.upcomingCheckins.length">
+        <thead><tr><th>Mã đơn</th><th>Nhận phòng</th><th>Loại phòng</th><th>Số phòng</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let u of data.upcomingCheckins">
+            <td>{{ u.publicCode }}</td>
+            <td>{{ u.checkIn }}</td>
+            <td>{{ u.roomTypeName }}</td>
+            <td>{{ u.rooms }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted" *ngIf="!data.upcomingCheckins.length">Không có đơn nào nhận phòng trong 7 ngày tới.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">Top loại phòng theo doanh thu</h2>
+      <table class="tbl" *ngIf="data.topRoomTypes.length">
+        <thead><tr><th>Loại phòng</th><th>Số đơn</th><th>Doanh thu</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of data.topRoomTypes">
+            <td>{{ r.name }}</td>
+            <td>{{ r.bookings }}</td>
+            <td>{{ r.revenue | number:'1.0-0' }} ₫</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted" *ngIf="!data.topRoomTypes.length">Chưa có doanh thu.</p>
+    </div>
+  </div>
+</div>

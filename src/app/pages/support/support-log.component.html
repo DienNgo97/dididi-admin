@@ -1,0 +1,62 @@
+<div class="page-head">
+  <h1>Lịch sử chat hỗ trợ</h1>
+  <button class="btn ghost" (click)="load()">Tải lại</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="cards" *ngIf="stats">
+  <div class="card"><div class="k">Tổng câu hỏi</div><div class="v">{{ stats.totalQuestions }}</div></div>
+  <div class="card"><div class="k">Hội thoại</div><div class="v">{{ stats.totalConversations }}</div></div>
+  <div class="card brand"><div class="k">Tỉ lệ chuyển tổng đài</div><div class="v">{{ stats.escalationRate }}%</div></div>
+  <div class="card"><div class="k">Trả lời từ KB</div><div class="v">{{ stats.kbAnswers }}</div></div>
+  <div class="card"><div class="k">Trả lời từ LLM</div><div class="v">{{ stats.llmAnswers }}</div></div>
+  <div class="card"><div class="k">Bot không trả lời được</div><div class="v">{{ stats.unresolvedAnswers }}</div></div>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading">
+  <thead>
+    <tr><th>Hội thoại</th><th>Số tin</th><th>Khách</th><th>Bắt đầu</th><th>Cập nhật</th><th>Tổng đài</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of pageItems">
+      <td><code>{{ shortId(c.conversationId) }}</code></td>
+      <td>{{ c.messageCount }}</td>
+      <td>{{ c.userId ? ('#' + c.userId) : 'Khách vãng lai' }}</td>
+      <td>{{ c.startedAt }}</td>
+      <td>{{ c.lastAt }}</td>
+      <td>
+        <span class="badge" *ngIf="c.escalated" style="background:#fff4e0;color:#b26a00">Có</span>
+        <span class="muted" *ngIf="!c.escalated">—</span>
+      </td>
+      <td><button class="btn ghost" (click)="view(c)">Xem</button></td>
+    </tr>
+    <tr *ngIf="pageItems.length === 0"><td colspan="7" class="muted">Chưa có hội thoại nào.</td></tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="!loading && all.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ all.length }} hội thoại</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>
+
+<div class="sl-overlay" *ngIf="selected" (click)="closeView()">
+  <div class="sl-box" (click)="$event.stopPropagation()">
+    <div class="sl-head">
+      <b>Hội thoại {{ shortId(selected.conversationId) }} · {{ selected.messageCount }} tin</b>
+      <button class="btn ghost" (click)="closeView()">Đóng</button>
+    </div>
+    <p class="muted" *ngIf="msgLoading">Đang tải tin nhắn...</p>
+    <div class="sl-msgs" *ngIf="!msgLoading">
+      <div *ngFor="let m of messages" class="sl-msg" [ngClass]="'r-' + (m.role | lowercase)">
+        <div class="sl-role">{{ m.role }}<span *ngIf="m.source"> · {{ m.source }}</span><span *ngIf="m.bookingCode"> · {{ m.bookingCode }}</span></div>
+        <div class="sl-text">{{ m.content }}</div>
+        <div class="sl-time muted">{{ m.createdAt }}</div>
+      </div>
+      <p class="muted" *ngIf="messages.length === 0">Không có tin nhắn.</p>
+    </div>
+  </div>
+</div>

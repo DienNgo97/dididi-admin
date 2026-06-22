@@ -5,9 +5,13 @@
 <div class="err" *ngIf="error">{{ error }}</div>
 
 <div class="filters">
-  <label class="muted">
-    <input type="checkbox" [ngModel]="onlyPending" (ngModelChange)="onlyPending = $event; load()"/> Chỉ hiện đang chờ duyệt
-  </label>
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option value="INACTIVE">Chờ duyệt (INACTIVE)</option>
+    <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+    <option value="LOCKED">Đã khoá (LOCKED)</option>
+  </select>
 </div>
 
 <div class="form" *ngIf="showForm">
@@ -36,18 +40,24 @@
 <table class="tbl" *ngIf="!loading">
   <thead><tr><th>Email</th><th>Chủ</th><th>Khách sạn</th><th>Trạng thái</th><th></th></tr></thead>
   <tbody>
-    <tr *ngFor="let v of vendors">
+    <tr *ngFor="let v of pageVendors">
       <td>{{ v.email }}</td>
       <td>{{ v.fullName }}</td>
       <td>{{ v.hotelName }} <span class="muted" *ngIf="v.hotelId">(#{{ v.hotelId }})</span></td>
       <td><span [ngClass]="'badge ' + (v.status | lowercase)">{{ v.status }}</span></td>
       <td class="actions">
         <button class="btn" *ngIf="v.status === 'INACTIVE'" (click)="approve(v)">Duyệt</button>
-        <button class="btn danger" *ngIf="v.status !== 'LOCKED'" (click)="reject(v)">Từ chối</button>
+        <button class="btn danger" *ngIf="v.status === 'INACTIVE'" (click)="reject(v)">Từ chối</button>
         <button class="btn danger" *ngIf="auth.role === 'SUPER_ADMIN' && v.status === 'ACTIVE'" (click)="ban(v)">Ban</button>
         <button class="btn" *ngIf="auth.role === 'SUPER_ADMIN' && v.status === 'LOCKED'" (click)="unban(v)">Gỡ ban</button>
       </td>
     </tr>
-    <tr *ngIf="vendors.length === 0"><td colspan="5" class="muted">Không có vendor.</td></tr>
+    <tr *ngIf="pageVendors.length === 0"><td colspan="5" class="muted">Không có vendor phù hợp.</td></tr>
   </tbody>
 </table>
+
+<div class="pager" *ngIf="!loading && filtered.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ filtered.length }} vendor</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>

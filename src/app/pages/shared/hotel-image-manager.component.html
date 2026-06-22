@@ -2,8 +2,8 @@
   <div class="page-head">
     <h2 style="margin:0">Ảnh khách sạn</h2>
     <label class="btn" style="cursor:pointer">
-      {{ uploading ? 'Đang tải...' : '+ Thêm ảnh' }}
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploading" hidden/>
+      {{ uploading ? ('Đang tải ' + pending + '...') : '+ Thêm ảnh' }}
+      <input type="file" accept="image/*" multiple (change)="onFileSelected($event)" [disabled]="uploading" hidden/>
     </label>
   </div>
 

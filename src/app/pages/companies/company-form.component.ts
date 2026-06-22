@@ -80,7 +80,7 @@ export class CompanyFormComponent implements OnInit {
     if (!this.id || !this.topupAmount || this.topupAmount <= 0) { return; }
     this.companyService.topup(this.id, this.topupAmount).subscribe({
       next: () => { this.topupAmount = null; this.reload(); },
-      error: (err) => alert(err?.error?.message || 'Nạp thất bại')
+      error: (err) => (window as any).appAlert(err?.error?.message || 'Nạp thất bại')
     });
   }
 
@@ -88,16 +88,16 @@ export class CompanyFormComponent implements OnInit {
     if (!this.id || !this.selectedUserId) { return; }
     this.companyService.assign(this.id, this.selectedUserId).subscribe({
       next: () => { this.selectedUserId = null; this.reload(); },
-      error: (err) => alert(err?.error?.message || 'Gán thất bại')
+      error: (err) => (window as any).appAlert(err?.error?.message || 'Gán thất bại')
     });
   }
 
-  unassign(e: CompanyEmployee): void {
+  async unassign(e: CompanyEmployee): Promise<void> {
     if (!this.id) { return; }
-    if (!confirm('Gỡ ' + e.email + ' khỏi công ty?')) { return; }
+    if (!await (window as any).appConfirm('Gỡ ' + e.email + ' khỏi công ty?')) { return; }
     this.companyService.unassign(this.id, e.userId).subscribe({
       next: () => this.reload(),
-      error: (err) => alert(err?.error?.message || 'Gỡ thất bại')
+      error: (err) => (window as any).appAlert(err?.error?.message || 'Gỡ thất bại')
     });
   }
 
@@ -113,16 +113,16 @@ export class CompanyFormComponent implements OnInit {
         this.inviteMsg = 'Đã tạo lời mời. Gửi link sau cho người được mời:';
         if (this.id) { this.companyService.invites(this.id).subscribe({ next: (i) => { this.invites = i; } }); }
       },
-      error: (err) => alert(err?.error?.message || 'Tạo lời mời thất bại')
+      error: (err) => (window as any).appAlert(err?.error?.message || 'Tạo lời mời thất bại')
     });
   }
 
-  revokeInvite(inv: CompanyInvite): void {
+  async revokeInvite(inv: CompanyInvite): Promise<void> {
     if (!this.id) { return; }
-    if (!confirm('Thu hồi lời mời cho ' + inv.email + '?')) { return; }
+    if (!await (window as any).appConfirm('Thu hồi lời mời cho ' + inv.email + '?')) { return; }
     this.companyService.revokeInvite(this.id, inv.id).subscribe({
       next: () => { if (this.id) { this.companyService.invites(this.id).subscribe({ next: (i) => { this.invites = i; } }); } },
-      error: (err) => alert(err?.error?.message || 'Thu hồi thất bại')
+      error: (err) => (window as any).appAlert(err?.error?.message || 'Thu hồi thất bại')
     });
   }
 
@@ -139,7 +139,7 @@ export class CompanyFormComponent implements OnInit {
         window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 30000);
       },
-      error: () => alert('Không tải được hóa đơn (đơn phải đã xác nhận).')
+      error: () => (window as any).appAlert('Không tải được hóa đơn (đơn phải đã xác nhận).')
     });
   }
 }

@@ -12,14 +12,38 @@
     </div>
     <p *ngIf="r.comment">{{ r.comment }}</p>
 
+    <div *ngIf="r.images?.length" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+      <img *ngFor="let u of r.images" [src]="apiBase + u" alt="ảnh đánh giá"
+           style="width:120px;height:90px;object-fit:cover;border-radius:8px"/>
+    </div>
+
     <div *ngIf="r.vendorReply" class="muted" style="border-left:3px solid #cdd3dd;padding-left:10px;margin-top:6px">
       <b>Bạn đã trả lời:</b> {{ r.vendorReply }}
+      <div *ngIf="r.replyImages?.length" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <img *ngFor="let u of r.replyImages" [src]="apiBase + u" alt="ảnh phản hồi"
+             style="width:120px;height:90px;object-fit:cover;border-radius:8px"/>
+      </div>
     </div>
 
     <div *ngIf="!r.vendorReply" style="margin-top:8px">
       <textarea rows="2" [(ngModel)]="replyText[r.id]" placeholder="Viết phản hồi tới khách..."
                 style="width:100%;padding:8px;border:1px solid #cdd3dd;border-radius:8px"></textarea>
-      <button class="btn" [disabled]="busy === r.id" (click)="sendReply(r)" style="margin-top:6px">
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <label class="btn ghost" style="display:inline-flex;align-items:center;gap:6px;margin:0">
+          <span aria-hidden="true">📷</span> Chọn ảnh
+          <input type="file" accept="image/*" multiple (change)="onReplyFiles(r.id, $event)" hidden/>
+        </label>
+        <span class="muted" style="font-size:12px">Tối đa 3 ảnh, không bắt buộc</span>
+      </div>
+      <div *ngIf="picked[r.id]?.length" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <div *ngFor="let p of picked[r.id]; let i = index"
+             style="position:relative;width:72px;height:72px;border:1px solid var(--line);border-radius:8px;overflow:hidden">
+          <img [src]="p.url" alt="" style="width:100%;height:100%;object-fit:cover;display:block"/>
+          <button type="button" (click)="removePick(r.id, i)" title="Xoá ảnh"
+                  style="position:absolute;top:2px;right:2px;width:20px;height:20px;line-height:18px;border:0;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;cursor:pointer;padding:0">×</button>
+        </div>
+      </div>
+      <button class="btn" [disabled]="busy === r.id" (click)="sendReply(r)" style="margin-top:10px">
         {{ busy === r.id ? 'Đang gửi...' : 'Trả lời' }}
       </button>
     </div>

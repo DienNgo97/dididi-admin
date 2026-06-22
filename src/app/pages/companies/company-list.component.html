@@ -4,6 +4,16 @@
 </div>
 
 <div class="err" *ngIf="error">{{ error }}</div>
+
+<div class="filters">
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option value="active">Hoạt động</option>
+    <option value="inactive">Khoá</option>
+  </select>
+</div>
+
 <p class="muted" *ngIf="loading">Đang tải...</p>
 
 <table class="tbl" *ngIf="!loading">
@@ -11,7 +21,7 @@
     <tr><th>Tên</th><th>Mã</th><th>Hạn mức tổng</th><th>Đã dùng</th><th>Còn lại</th><th>Trạng thái</th><th></th></tr>
   </thead>
   <tbody>
-    <tr *ngFor="let c of companies">
+    <tr *ngFor="let c of pageCompanies">
       <td>{{ c.name }}</td>
       <td>{{ c.code }}</td>
       <td>{{ c.budgetTotal | number }} đ</td>
@@ -20,6 +30,12 @@
       <td><span [ngClass]="c.active ? 'badge active' : 'badge'">{{ c.active ? 'Hoạt động' : 'Khoá' }}</span></td>
       <td class="actions"><button class="btn ghost" (click)="manage(c)">Quản lý</button></td>
     </tr>
-    <tr *ngIf="companies.length === 0"><td colspan="7" class="muted">Chưa có công ty.</td></tr>
+    <tr *ngIf="pageCompanies.length === 0"><td colspan="7" class="muted">Không có công ty phù hợp.</td></tr>
   </tbody>
 </table>
+
+<div class="pager" *ngIf="!loading && filtered.length">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ page + 1 }}/{{ totalPages }} · {{ filtered.length }} công ty</span>
+  <button class="btn ghost" (click)="next()" [disabled]="page + 1 >= totalPages">Sau ›</button>
+</div>
