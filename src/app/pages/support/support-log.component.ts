@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { SupportLogService } from '../../api/support-log.service';
 import { SupportStats, SupportConversation, SupportChatMessage } from '../../core/admin-models';
 
@@ -20,7 +22,8 @@ import { SupportStats, SupportConversation, SupportChatMessage } from '../../cor
     .sl-time{font-size:11px;margin-top:3px;}
   `]
 })
-export class SupportLogComponent implements OnInit {
+export class SupportLogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   stats?: SupportStats;
   all: SupportConversation[] = [];
   pageItems: SupportConversation[] = [];
@@ -37,11 +40,19 @@ export class SupportLogComponent implements OnInit {
 
   ngOnInit(): void { this.load(); }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   load(): void {
     this.loading = true;
     this.error = '';
-    this.svc.stats().subscribe({ next: (s) => { this.stats = s; }, error: () => {} });
-    this.svc.conversations().subscribe({
+    this.svc.stats().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (s) => { this.stats = s; },
+      error: (e) => { this.error = e?.error?.message || 'Không tải được thống kê hỗ trợ'; }
+    });
+    this.svc.conversations().pipe(takeUntil(this.destroy$)).subscribe({
       next: (c) => { this.all = c || []; this.page = 0; this.recompute(); this.loading = false; },
       error: (e) => { this.error = e?.error?.message || 'Không tải được danh sách hội thoại'; this.loading = false; }
     });
@@ -62,9 +73,9 @@ export class SupportLogComponent implements OnInit {
     this.selected = c;
     this.messages = [];
     this.msgLoading = true;
-    this.svc.messages(c.conversationId).subscribe({
+    this.svc.messages(c.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (m) => { this.messages = m || []; this.msgLoading = false; },
-      error: () => { this.msgLoading = false; }
+      error: (e) => { this.msgLoading = false; window.appAlert(e?.error?.message || 'Không tải được nội dung hội thoại'); }
     });
   }
 

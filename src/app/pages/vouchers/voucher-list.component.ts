@@ -148,6 +148,15 @@ export class VoucherListComponent implements OnInit {
   save(): void {
     this.formError = '';
     if (!this.model.code || !this.model.code.trim()) { this.formError = 'Vui lòng nhập mã voucher'; return; }
+    // discountValue bind <input type=number>: xoá trắng -> null/NaN. Bắt buộc không rỗng & >= 0.
+    if (this.model.discountValue == null || isNaN(this.model.discountValue) || this.model.discountValue < 0) {
+      this.formError = 'Giá trị giảm phải là số không âm';
+      return;
+    }
+    if (this.model.discountType === 'PERCENT' && this.model.discountValue > 100) {
+      this.formError = 'Phần trăm giảm tối đa là 100';
+      return;
+    }
     this.model.validFrom = this.validFromDate ? `${this.validFromDate}T00:00:00Z` : null;
     this.model.validTo = this.validToDate ? `${this.validToDate}T23:59:59Z` : null;
 
@@ -161,10 +170,10 @@ export class VoucherListComponent implements OnInit {
   }
 
   async remove(v: Voucher): Promise<void> {
-    if (!await (window as any).appConfirm(`Xoá voucher ${v.code}?`)) { return; }
+    if (!await window.appConfirm(`Xoá voucher ${v.code}?`)) { return; }
     this.voucherService.delete(v.id).subscribe({
       next: () => this.load(),
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Xoá thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Xoá thất bại')
     });
   }
 }

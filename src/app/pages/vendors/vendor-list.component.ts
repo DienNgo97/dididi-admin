@@ -79,31 +79,32 @@ export class VendorListComponent implements OnInit {
   approve(v: VendorAccount): void {
     this.adminVendorService.approve(v.userId).subscribe({
       next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; this.recompute(); },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Duyệt thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Duyệt thất bại')
     });
   }
 
   async reject(v: VendorAccount): Promise<void> {
-    if (!await (window as any).appConfirm('Từ chối / khoá vendor ' + v.email + '?')) { return; }
+    if (!await window.appConfirm('Từ chối / khoá vendor ' + v.email + '?')) { return; }
     this.adminVendorService.reject(v.userId).subscribe({
       next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; this.recompute(); },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Từ chối thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Từ chối thất bại')
     });
   }
 
   async ban(v: VendorAccount): Promise<void> {
-    const reason = await (window as any).appPrompt('Ban vendor ' + v.email + '?\nLý do:', 'Vi phạm chính sách');
-    if (reason === null) { return; }
-    this.adminVendorService.ban(v.userId, reason).subscribe({
+    const reason = await window.appPrompt('Ban vendor ' + v.email + '?\nLý do:', 'Vi phạm chính sách');
+    // Bấm Huỷ (null) hoặc lý do trống đều bỏ qua — không ban với lý do rỗng.
+    if (reason === null || !reason.trim()) { return; }
+    this.adminVendorService.ban(v.userId, reason.trim()).subscribe({
       next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; this.recompute(); },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Ban thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Ban thất bại')
     });
   }
 
   unban(v: VendorAccount): void {
     this.adminVendorService.unban(v.userId).subscribe({
       next: (u) => { v.status = u.status; v.hotelActive = u.hotelActive; this.recompute(); },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Gỡ ban thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Gỡ ban thất bại')
     });
   }
 
@@ -118,7 +119,7 @@ export class VendorListComponent implements OnInit {
     this.saving = true;
     this.adminVendorService.create(this.form).subscribe({
       next: () => { this.saving = false; this.showForm = false; this.load(); },
-      error: (err) => { this.saving = false; (window as any).appAlert(err?.error?.message || 'Tạo vendor thất bại'); }
+      error: (err) => { this.saving = false; window.appAlert(err?.error?.message || 'Tạo vendor thất bại'); }
     });
   }
 }

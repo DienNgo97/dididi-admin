@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommissionService } from '../../api/commission.service';
 import { UserService } from '../../api/user.service';
 import { CommissionConfig, VendorCommission, CommissionReport, CommissionReportRow, AdminUser } from '../../core/admin-models';
@@ -7,7 +9,8 @@ import { CommissionConfig, VendorCommission, CommissionReport, CommissionReportR
   selector: 'app-commission',
   templateUrl: './commission.component.html'
 })
-export class CommissionComponent implements OnInit {
+export class CommissionComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   config?: CommissionConfig;
   defaultPercent = 0;
   vendors: VendorCommission[] = [];
@@ -26,17 +29,29 @@ export class CommissionComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAll();
-    this.userService.list(0, 200, 'VENDOR').subscribe({ next: (p) => { this.vendorOptions = p.content; } });
+    this.userService.list(0, 200, 'VENDOR').pipe(takeUntil(this.destroy$)).subscribe({
+      next: (p) => { this.vendorOptions = p.content; },
+      error: (e) => { this.error = e?.error?.message || 'Không tải được danh sách vendor'; }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadAll(): void {
-    this.commission.config().subscribe({
+    this.commission.config().pipe(takeUntil(this.destroy$)).subscribe({
       next: (c) => { this.config = c; this.defaultPercent = this.pct(c.defaultRate); },
       error: (e) => { this.error = e?.error?.message || 'Không tải được cấu hình'; }
     });
-    this.commission.vendors().subscribe({ next: (v) => { this.vendors = v; } });
-    this.commission.report().subscribe({
-      next: (r) => { this.report = r; this.reportPage = 0; this.applyReportPage(); }
+    this.commission.vendors().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (v) => { this.vendors = v; },
+      error: (e) => { this.error = e?.error?.message || 'Không tải được hoa hồng vendor'; }
+    });
+    this.commission.report().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (r) => { this.report = r; this.reportPage = 0; this.applyReportPage(); },
+      error: (e) => { this.error = e?.error?.message || 'Không tải được báo cáo hoa hồng'; }
     });
   }
 
@@ -60,7 +75,7 @@ export class CommissionComponent implements OnInit {
   saveDefault(): void {
     this.error = ''; this.msg = '';
     this.savingDefault = true;
-    this.commission.setConfig((this.defaultPercent || 0) / 100).subscribe({
+    this.commission.setConfig((this.defaultPercent || 0) / 100).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => { this.savingDefault = false; this.msg = 'Đã lưu hoa hồng mặc định'; this.loadAll(); },
       error: (e) => { this.savingDefault = false; this.error = e?.error?.message || 'Lưu thất bại'; }
     });
@@ -68,17 +83,17 @@ export class CommissionComponent implements OnInit {
 
   addVendor(): void {
     if (!this.selVendorId || this.selVendorPercent == null) { return; }
-    this.commission.setVendor(this.selVendorId, this.selVendorPercent / 100).subscribe({
+    this.commission.setVendor(this.selVendorId, this.selVendorPercent / 100).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => { this.selVendorId = null; this.selVendorPercent = null; this.loadAll(); },
-      error: (e) => (window as any).appAlert(e?.error?.message || 'Đặt thất bại')
+      error: (e) => window.appAlert(e?.error?.message || e?.message || 'Đặt thất bại')
     });
   }
 
   async removeVendor(v: VendorCommission): Promise<void> {
-    if (!await (window as any).appConfirm('Gỡ hoa hồng riêng của vendor này (về dùng mặc định)?')) { return; }
-    this.commission.removeVendor(v.vendorId).subscribe({
+    if (!await window.appConfirm('Gỡ hoa hồng riêng của vendor này (về dùng mặc định)?')) { return; }
+    this.commission.removeVendor(v.vendorId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.loadAll(),
-      error: (e) => (window as any).appAlert(e?.error?.message || 'Gỡ thất bại')
+      error: (e) => window.appAlert(e?.error?.message || e?.message || 'Gỡ thất bại')
     });
   }
 

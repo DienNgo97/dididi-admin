@@ -2,13 +2,15 @@ import { Component } from '@angular/core';
 
 type DialogMode = 'confirm' | 'prompt' | 'alert';
 
+// Kiểu của window.appConfirm/appPrompt/appAlert khai báo tại src/global.d.ts.
+
 /**
  * Hộp thoại dùng chung cho admin (thay confirm()/prompt()/alert() native, đồng bộ tông Dididi).
  * Đăng ký 3 hàm toàn cục, đặt 1 lần trong app.component.html: <app-confirm-dialog></app-confirm-dialog>
  *
- *   if (!await (window as any).appConfirm('...')) { return; }        // -> Promise<boolean>
- *   const v = await (window as any).appPrompt('Lý do:', 'mặc định'); // -> Promise<string|null> (null = Huỷ)
- *   (window as any).appAlert('Thao tác thất bại');                   // -> Promise<void>
+ *   if (!await window.appConfirm('...')) { return; }        // -> Promise<boolean>
+ *   const v = await window.appPrompt('Lý do:', 'mặc định'); // -> Promise<string|null> (null = Huỷ)
+ *   window.appAlert('Thao tác thất bại');                   // -> Promise<void>
  */
 @Component({
   selector: 'app-confirm-dialog',
@@ -49,9 +51,9 @@ export class ConfirmDialogComponent {
   private resolver: ((v: any) => void) | null = null;
 
   constructor() {
-    (window as any).appConfirm = (message: string) => this.openConfirm(message);
-    (window as any).appPrompt = (message: string, def = '') => this.openPrompt(message, def);
-    (window as any).appAlert = (message: string) => this.openAlert(message);
+    window.appConfirm = (message: string) => this.openConfirm(message);
+    window.appPrompt = (message: string, def = '') => this.openPrompt(message, def);
+    window.appAlert = (message: string) => this.openAlert(message);
   }
 
   openConfirm(message: string): Promise<boolean> {

@@ -10,6 +10,11 @@ import { AuthService } from './core/auth.service';
 export class AppComponent {
   constructor(public auth: AuthService, private router: Router) {}
 
+  /** Trang xác thực (login...) -> KHÔNG render sidebar/shell của app. */
+  get isAuthPage(): boolean {
+    return this.router.url.split('?')[0].split('#')[0].startsWith('/login');
+  }
+
   /** 2 chữ cái đầu cho avatar, suy ra từ email. */
   get initials(): string {
     const email = this.auth.email || '';

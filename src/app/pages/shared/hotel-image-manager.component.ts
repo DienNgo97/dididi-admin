@@ -1,4 +1,6 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { HotelImageService } from '../../api/hotel-image.service';
 import { HotelImage } from '../../core/models';
 
@@ -11,9 +13,10 @@ import { HotelImage } from '../../core/models';
   selector: 'app-hotel-image-manager',
   templateUrl: './hotel-image-manager.component.html'
 })
-export class HotelImageManagerComponent implements OnInit, OnChanges {
+export class HotelImageManagerComponent implements OnInit, OnChanges, OnDestroy {
   @Input() hotelId?: number;
 
+  private destroy$ = new Subject<void>();
   images: HotelImage[] = [];
   loading = false;
   uploading = false;
@@ -26,6 +29,11 @@ export class HotelImageManagerComponent implements OnInit, OnChanges {
     if (this.hotelId == null) {
       this.load(); // che do vendor: tai 1 lan
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnChanges(): void {
@@ -44,7 +52,7 @@ export class HotelImageManagerComponent implements OnInit, OnChanges {
     const obs = this.isAdmin()
       ? this.imageService.listForHotel(this.hotelId as number)
       : this.imageService.listMy();
-    obs.subscribe({
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (list) => { this.images = list; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được ảnh'; this.loading = false; }
     });
@@ -62,15 +70,19 @@ export class HotelImageManagerComponent implements OnInit, OnChanges {
     // Upload tuan tu: backend dat sortOrder theo so anh hien co -> tranh dua nhau gay trung thu tu.
     const uploadAt = (i: number): void => {
       if (i >= files.length) {
+        // finalize() o moi buoc da dam bao reset uploading; reset lai cho chac va dong bo lai server.
         this.uploading = false;
         this.pending = 0;
         if (failed > 0) { this.error = 'Có ' + failed + ' ảnh tải không thành công.'; }
+        // Tai lai tu server de thu tu gallery khop sortOrder backend gan (tranh lech khi co anh loi giua chung).
+        this.load();
         return;
       }
       const obs = this.isAdmin()
         ? this.imageService.uploadForHotel(this.hotelId as number, files[i])
         : this.imageService.uploadMy(files[i]);
-      obs.subscribe({
+      // finalize() luon chay (next/error/unsubscribe) -> uploading khong bao gio ket cung "true".
+      obs.pipe(takeUntil(this.destroy$), finalize(() => { this.uploading = false; })).subscribe({
         next: (img) => { this.images = [...this.images, img]; this.pending--; uploadAt(i + 1); },
         error: () => { failed++; this.pending--; uploadAt(i + 1); }
       });
@@ -79,13 +91,13 @@ export class HotelImageManagerComponent implements OnInit, OnChanges {
   }
 
   async remove(img: HotelImage): Promise<void> {
-    if (!await (window as any).appConfirm('Xoá ảnh này?')) { return; }
+    if (!await window.appConfirm('Xoá ảnh này?')) { return; }
     const obs = this.isAdmin()
       ? this.imageService.deleteForHotel(this.hotelId as number, img.id)
       : this.imageService.deleteMy(img.id);
     obs.subscribe({
       next: () => { this.images = this.images.filter((i) => i.id !== img.id); },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Xoá thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Xoá thất bại')
     });
   }
 

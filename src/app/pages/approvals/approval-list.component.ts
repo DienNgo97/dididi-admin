@@ -70,7 +70,7 @@ export class ApprovalListComponent implements OnInit {
   }
 
   async approve(r: ApprovalRequest): Promise<void> {
-    if (!await (window as any).appConfirm('Duyệt đơn ' + (r.bookingCode || '') + '? Ngân sách công ty sẽ bị trừ và đơn được xác nhận.')) { return; }
+    if (!await window.appConfirm('Duyệt đơn ' + (r.bookingCode || '') + '? Ngân sách công ty sẽ bị trừ và đơn được xác nhận.')) { return; }
     this.busyId = r.id; this.msg = ''; this.error = '';
     this.approvalService.approve(r.id).subscribe({
       next: () => { this.busyId = null; this.msg = 'Đã duyệt và xác nhận đơn ' + (r.bookingCode || ''); this.load(); },
@@ -79,7 +79,7 @@ export class ApprovalListComponent implements OnInit {
   }
 
   async reject(r: ApprovalRequest): Promise<void> {
-    const note = await (window as any).appPrompt('Lý do từ chối (tuỳ chọn):');
+    const note = await window.appPrompt('Lý do từ chối (tuỳ chọn):');
     if (note === null) { return; } // bấm Huỷ
     this.busyId = r.id; this.msg = ''; this.error = '';
     this.approvalService.reject(r.id, note || undefined).subscribe({
