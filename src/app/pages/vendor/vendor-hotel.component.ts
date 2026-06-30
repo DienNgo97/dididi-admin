@@ -78,18 +78,18 @@ export class VendorHotelComponent implements OnInit {
       : this.vendorService.updateRoomType(this.editingId, this.form);
     obs.subscribe({
       next: () => { this.saving = false; this.showForm = false; this.editingId = null; this.loadRoomTypes(); },
-      error: (err) => { this.saving = false; (window as any).appAlert(err?.error?.message || 'Lưu thất bại'); }
+      error: (err) => { this.saving = false; window.appAlert(err?.error?.message || 'Lưu thất bại'); }
     });
   }
 
   async deleteRoomType(rt: VendorRoomType): Promise<void> {
-    if (!await (window as any).appConfirm('Xoá loại phòng "' + rt.name + '" (kèm toàn bộ tồn kho)?')) { return; }
+    if (!await window.appConfirm('Xoá loại phòng "' + rt.name + '" (kèm toàn bộ tồn kho)?')) { return; }
     this.vendorService.deleteRoomType(rt.id).subscribe({
       next: () => {
         if (this.selected?.id === rt.id) { this.selected = undefined; this.invRows = []; }
         this.loadRoomTypes();
       },
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Xoá thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Xoá thất bại')
     });
   }
 

@@ -39,11 +39,15 @@ export class CompanyService {
   }
 
   assign(id: number, userId: number): Observable<unknown> {
-    return this.http.post<ApiResponse<unknown>>(`${this.base}/${id}/employees/${userId}`, {});
+    return this.http
+      .post<ApiResponse<unknown>>(`${this.base}/${id}/employees/${userId}`, {})
+      .pipe(map((r) => { if (!r.success) { throw new Error(r.message || 'Gán nhân viên thất bại'); } return r.data; }));
   }
 
   unassign(id: number, userId: number): Observable<unknown> {
-    return this.http.delete<ApiResponse<unknown>>(`${this.base}/${id}/employees/${userId}`);
+    return this.http
+      .delete<ApiResponse<unknown>>(`${this.base}/${id}/employees/${userId}`)
+      .pipe(map((r) => { if (!r.success) { throw new Error(r.message || 'Gỡ nhân viên thất bại'); } return r.data; }));
   }
 
   bookings(id: number): Observable<CompanyBooking[]> {
@@ -65,6 +69,8 @@ export class CompanyService {
   }
 
   revokeInvite(id: number, inviteId: number): Observable<unknown> {
-    return this.http.delete<ApiResponse<unknown>>(`${this.base}/${id}/invites/${inviteId}`);
+    return this.http
+      .delete<ApiResponse<unknown>>(`${this.base}/${id}/invites/${inviteId}`)
+      .pipe(map((r) => { if (!r.success) { throw new Error(r.message || 'Thu hồi lời mời thất bại'); } return r.data; }));
   }
 }

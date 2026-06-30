@@ -34,9 +34,8 @@ export class ReviewService {
   }
 
   remove(id: number): Observable<void> {
-    return this.http
-      .delete<ApiResponse<void>>(`${this.adminBase}/${id}`)
-      .pipe(map((r) => r.data));
+    // Backend co the tra 204 No Content (body rong) -> dung delete<void>, khong unwrap r.data.
+    return this.http.delete<void>(`${this.adminBase}/${id}`);
   }
 
   // ---- Vendor trả lời ----

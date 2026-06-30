@@ -28,7 +28,8 @@ export class VendorService {
   }
 
   deleteRoomType(id: number): Observable<void> {
-    return this.http.delete<ApiResponse<void>>(`${this.base}/room-types/${id}`).pipe(map((r) => r.data));
+    // Backend co the tra 204 No Content (body rong) -> dung delete<void>, khong unwrap r.data.
+    return this.http.delete<void>(`${this.base}/room-types/${id}`);
   }
 
   getInventory(id: number, from: string, to: string): Observable<InventoryDay[]> {

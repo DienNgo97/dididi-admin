@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -27,6 +27,10 @@ import { VoucherListComponent } from './pages/vouchers/voucher-list.component';
 import { AdminReportComponent } from './pages/reports/admin-report.component';
 import { SupportLogComponent } from './pages/support/support-log.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
+import { BarChartComponent } from './pages/shared/bar-chart.component';
+import { VendorDashboardComponent } from './pages/vendor/vendor-dashboard.component';
+import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component';
+import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
 @NgModule({
@@ -53,10 +57,17 @@ import { AuthInterceptor } from './core/auth.interceptor';
     VoucherListComponent,
     AdminReportComponent,
     SupportLogComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    BarChartComponent,
+    VendorDashboardComponent,
+    VendorRevenueComponent,
+    VendorInventoryReportComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'vi' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

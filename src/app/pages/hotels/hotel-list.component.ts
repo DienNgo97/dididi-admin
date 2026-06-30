@@ -98,10 +98,10 @@ export class HotelListComponent implements OnInit {
 
   async remove(h: Hotel): Promise<void> {
     if (!h.id) { return; }
-    if (!await (window as any).appConfirm('Xoá khách sạn "' + h.name + '"?')) { return; }
+    if (!await window.appConfirm('Xoá khách sạn "' + h.name + '"?')) { return; }
     this.hotelService.remove(h.id).subscribe({
       next: () => this.load(),
-      error: (err) => (window as any).appAlert(err?.error?.message || 'Xoá thất bại')
+      error: (err) => window.appAlert(err?.error?.message || 'Xoá thất bại')
     });
   }
 }

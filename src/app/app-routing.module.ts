@@ -11,6 +11,9 @@ import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
 import { ReviewAdminComponent } from './pages/reviews/review-admin.component';
 import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
+import { VendorDashboardComponent } from './pages/vendor/vendor-dashboard.component';
+import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component';
+import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuditLogComponent } from './pages/audit/audit-log.component';
 import { CommissionComponent } from './pages/commission/commission.component';
 import { ApprovalListComponent } from './pages/approvals/approval-list.component';
@@ -51,6 +54,9 @@ const routes: Routes = [
 
   // Khu vendor
   { path: 'vendor', component: VendorHotelComponent, canActivate: [roleGuard('VENDOR')] },
+  { path: 'vendor/dashboard', component: VendorDashboardComponent, canActivate: [roleGuard('VENDOR')] },
+  { path: 'vendor/revenue', component: VendorRevenueComponent, canActivate: [roleGuard('VENDOR')] },
+  { path: 'vendor/inventory', component: VendorInventoryReportComponent, canActivate: [roleGuard('VENDOR')] },
   { path: 'vendor/reviews', component: VendorReviewComponent, canActivate: [roleGuard('VENDOR')] },
 
   { path: '**', redirectTo: 'dashboard' }

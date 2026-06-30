@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ReviewService } from '../../api/review.service';
 import { API_BASE } from '../../core/api.config';
 import { AdminReview, PagedResponse } from '../../core/admin-models';
@@ -8,7 +10,8 @@ import { AdminReview, PagedResponse } from '../../core/admin-models';
   selector: 'app-vendor-review',
   templateUrl: './vendor-review.component.html'
 })
-export class VendorReviewComponent implements OnInit {
+export class VendorReviewComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   data?: PagedResponse<AdminReview>;
   page = 0;
   size = 20;
@@ -24,10 +27,24 @@ export class VendorReviewComponent implements OnInit {
 
   ngOnInit(): void { this.load(); }
 
+  /** Thu hồi mọi blob URL còn treo (tránh leak khi rời trang giữa lúc đang chọn ảnh). */
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    Object.values(this.picked).forEach((list) => (list || []).forEach((p) => URL.revokeObjectURL(p.raw)));
+    this.picked = {};
+  }
+
+  /** Thu hồi các blob URL của 1 review (sau khi gửi thành công). */
+  private revokePicked(id: number): void {
+    (this.picked[id] || []).forEach((p) => URL.revokeObjectURL(p.raw));
+    this.picked[id] = [];
+  }
+
   load(): void {
     this.loading = true;
     this.error = '';
-    this.reviewService.vendorList(this.page, this.size).subscribe({
+    this.reviewService.vendorList(this.page, this.size).pipe(takeUntil(this.destroy$)).subscribe({
       next: (d) => { this.data = d; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được danh sách'; this.loading = false; }
     });
@@ -61,9 +78,9 @@ export class VendorReviewComponent implements OnInit {
     if (!text) { return; }
     this.busy = r.id;
     const files = (this.picked[r.id] || []).map((p) => p.file);
-    this.reviewService.reply(r.id, text, files).subscribe({
-      next: () => { this.busy = 0; this.replyText[r.id] = ''; this.picked[r.id] = []; this.load(); },
-      error: (err) => { this.busy = 0; (window as any).appAlert(err?.error?.message || 'Trả lời thất bại'); }
+    this.reviewService.reply(r.id, text, files).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.busy = 0; this.replyText[r.id] = ''; this.revokePicked(r.id); this.load(); },
+      error: (err) => { this.busy = 0; window.appAlert(err?.error?.message || 'Trả lời thất bại'); }
     });
   }
 }

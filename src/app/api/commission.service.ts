@@ -26,11 +26,15 @@ export class CommissionService {
 
   setVendor(vendorId: number, rate: number): Observable<unknown> {
     const params = new HttpParams().set('rate', rate);
-    return this.http.put<ApiResponse<unknown>>(`${this.base}/vendors/${vendorId}`, {}, { params });
+    return this.http
+      .put<ApiResponse<unknown>>(`${this.base}/vendors/${vendorId}`, {}, { params })
+      .pipe(map((r) => { if (!r.success) { throw new Error(r.message || 'Đặt hoa hồng vendor thất bại'); } return r.data; }));
   }
 
   removeVendor(vendorId: number): Observable<unknown> {
-    return this.http.delete<ApiResponse<unknown>>(`${this.base}/vendors/${vendorId}`);
+    return this.http
+      .delete<ApiResponse<unknown>>(`${this.base}/vendors/${vendorId}`)
+      .pipe(map((r) => { if (!r.success) { throw new Error(r.message || 'Gỡ hoa hồng vendor thất bại'); } return r.data; }));
   }
 
   report(): Observable<CommissionReport> {

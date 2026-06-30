@@ -1,5 +1,5 @@
 <div class="layout">
-  <aside class="sidebar" *ngIf="auth.isLoggedIn()">
+  <aside class="sidebar" *ngIf="auth.isLoggedIn() && !isAuthPage">
     <a class="brand" [routerLink]="auth.role === 'VENDOR' ? '/vendor' : '/dashboard'">
       <span class="logo">
         <svg viewBox="0 0 24 24" fill="#0f2a1e"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
@@ -81,9 +81,21 @@
 
     <nav *ngIf="auth.role === 'VENDOR'">
       <div class="nav-sec">Vendor</div>
-      <a routerLink="/vendor" routerLinkActive="active">
+      <a routerLink="/vendor" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8m0 4h18m0 6V11a3 3 0 0 0-3-3H7"/><circle cx="7.5" cy="11.5" r="1.3"/></svg>
         <span>Khách sạn của tôi</span>
+      </a>
+      <a routerLink="/vendor/dashboard" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Tổng quan</span>
+      </a>
+      <a routerLink="/vendor/revenue" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        <span>Doanh thu</span>
+      </a>
+      <a routerLink="/vendor/inventory" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/></svg>
+        <span>Tồn kho</span>
       </a>
       <a routerLink="/vendor/reviews" routerLinkActive="active">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 14.6 9l6 .5-4.5 4 1.4 5.9L12 16.3 6.5 19.4 7.9 13.5 3.4 9.5l6-.5z"/></svg>
