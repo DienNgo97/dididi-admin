@@ -15,6 +15,7 @@ import { UserListComponent } from './pages/users/user-list.component';
 import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
 import { ReviewAdminComponent } from './pages/reviews/review-admin.component';
+import { CommunityAdminComponent } from './pages/community/community-admin.component';
 import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
 import { AuditLogComponent } from './pages/audit/audit-log.component';
 import { CommissionComponent } from './pages/commission/commission.component';
@@ -46,6 +47,7 @@ import { AuthInterceptor } from './core/auth.interceptor';
     VendorHotelComponent,
     VendorListComponent,
     ReviewAdminComponent,
+    CommunityAdminComponent,
     VendorReviewComponent,
     AuditLogComponent,
     HotelImageManagerComponent,
