@@ -1,0 +1,196 @@
+<div class="page-head"><h1>Quản lý cộng đồng</h1></div>
+
+<div class="subtabs">
+  <button class="btn" [class.ghost]="tab !== 'reports'" (click)="switchTab('reports')">Báo cáo</button>
+  <button class="btn" [class.ghost]="tab !== 'posts'" (click)="switchTab('posts')">Bài viết</button>
+  <button class="btn" [class.ghost]="tab !== 'comments'" (click)="switchTab('comments')">Bình luận</button>
+  <button class="btn" [class.ghost]="tab !== 'members'" (click)="switchTab('members')">Thành viên</button>
+  <button class="btn" [class.ghost]="tab !== 'stats'" (click)="switchTab('stats')">Thống kê</button>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+
+<!-- ============ BÁO CÁO ============ -->
+<ng-container *ngIf="tab === 'reports'">
+  <div class="filters">
+    <label class="muted">Trạng thái:</label>
+    <select [ngModel]="rStatus" (ngModelChange)="rStatus = $event; rFilter()">
+      <option *ngFor="let s of reportStatuses" [value]="s">{{ s || 'Tất cả' }}</option>
+    </select>
+  </div>
+  <p class="muted" *ngIf="loadingR">Đang tải...</p>
+  <table class="tbl" *ngIf="!loadingR && reports">
+    <thead>
+      <tr><th>#</th><th>Đối tượng</th><th>Lý do</th><th>Ghi chú</th><th>Người báo cáo</th><th>Trạng thái</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of reports.content">
+        <td>{{ r.id }}</td>
+        <td>{{ r.targetType }} #{{ r.targetId }}</td>
+        <td>{{ r.reason }}</td>
+        <td>{{ r.note }}</td>
+        <td>{{ r.reporterName || ('#' + r.reporterUserId) }}</td>
+        <td><span [ngClass]="'badge ' + (r.status | lowercase)">{{ r.status }}</span></td>
+        <td class="actions">
+          <ng-container *ngIf="r.status === 'OPEN'">
+            <button class="btn" [disabled]="busy === r.id" (click)="rHide(r)">Ẩn</button>
+            <button class="btn danger" [disabled]="busy === r.id" (click)="rRemove(r)">Gỡ</button>
+            <button class="btn ghost" [disabled]="busy === r.id" (click)="rDismiss(r)">Bỏ qua</button>
+          </ng-container>
+          <span class="muted" *ngIf="r.status !== 'OPEN'">Đã xử lý</span>
+        </td>
+      </tr>
+      <tr *ngIf="reports.content.length === 0"><td colspan="7" class="muted">Không có báo cáo.</td></tr>
+    </tbody>
+  </table>
+  <div class="pager" *ngIf="reports">
+    <button class="btn ghost" (click)="rPrev()" [disabled]="rPage === 0">‹ Trước</button>
+    <span class="muted">Trang {{ reports.page + 1 }}/{{ reports.totalPages || 1 }} · {{ reports.totalElements }} báo cáo</span>
+    <button class="btn ghost" (click)="rNext()" [disabled]="reports.page + 1 >= reports.totalPages">Sau ›</button>
+  </div>
+</ng-container>
+
+<!-- ============ BÀI VIẾT ============ -->
+<ng-container *ngIf="tab === 'posts'">
+  <div class="filters">
+    <label class="muted">Trạng thái:</label>
+    <select [ngModel]="pStatus" (ngModelChange)="pStatus = $event; pFilter()">
+      <option *ngFor="let s of contentStatuses" [value]="s">{{ s || 'Tất cả' }}</option>
+    </select>
+    <input placeholder="Tìm theo nội dung..." [(ngModel)]="pQ" (keyup.enter)="pFilter()" />
+    <button class="btn ghost" (click)="pFilter()">Tìm</button>
+  </div>
+  <p class="muted" *ngIf="loadingP">Đang tải...</p>
+  <table class="tbl" *ngIf="!loadingP && posts">
+    <thead>
+      <tr><th>#</th><th>Tác giả</th><th>Nội dung</th><th>Loại</th><th>❤ / 💬 / 🔁</th><th>Trạng thái</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of posts.content">
+        <td>{{ p.id }}</td>
+        <td>{{ p.authorName || ('#' + p.authorUserId) }}</td>
+        <td>{{ p.caption }}</td>
+        <td>{{ p.type }}</td>
+        <td>{{ p.likeCount }} / {{ p.commentCount }} / {{ p.repostCount }}</td>
+        <td><span [ngClass]="'badge ' + (p.status | lowercase)">{{ p.status }}</span></td>
+        <td class="actions">
+          <button class="btn ghost" *ngIf="p.status === 'PUBLISHED'" [disabled]="busy === p.id" (click)="pHide(p)">Ẩn</button>
+          <button class="btn" *ngIf="p.status === 'HIDDEN'" [disabled]="busy === p.id" (click)="pUnhide(p)">Hiện</button>
+          <button class="btn" *ngIf="p.status === 'REMOVED'" [disabled]="busy === p.id" (click)="pRestore(p)">Khôi phục</button>
+          <button class="btn danger" *ngIf="p.status !== 'REMOVED'" [disabled]="busy === p.id" (click)="pRemove(p)">Gỡ</button>
+        </td>
+      </tr>
+      <tr *ngIf="posts.content.length === 0"><td colspan="7" class="muted">Không có bài viết.</td></tr>
+    </tbody>
+  </table>
+  <div class="pager" *ngIf="posts">
+    <button class="btn ghost" (click)="pPrev()" [disabled]="pPage === 0">‹ Trước</button>
+    <span class="muted">Trang {{ posts.page + 1 }}/{{ posts.totalPages || 1 }} · {{ posts.totalElements }} bài</span>
+    <button class="btn ghost" (click)="pNext()" [disabled]="posts.page + 1 >= posts.totalPages">Sau ›</button>
+  </div>
+</ng-container>
+
+<!-- ============ BÌNH LUẬN ============ -->
+<ng-container *ngIf="tab === 'comments'">
+  <div class="filters">
+    <label class="muted">Trạng thái:</label>
+    <select [ngModel]="cStatus" (ngModelChange)="cStatus = $event; cFilter()">
+      <option *ngFor="let s of contentStatuses" [value]="s">{{ s || 'Tất cả' }}</option>
+    </select>
+  </div>
+  <p class="muted" *ngIf="loadingC">Đang tải...</p>
+  <table class="tbl" *ngIf="!loadingC && comments">
+    <thead>
+      <tr><th>#</th><th>Bài</th><th>Tác giả</th><th>Nội dung</th><th>❤</th><th>Trạng thái</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of comments.content">
+        <td>{{ c.id }}</td>
+        <td>#{{ c.postId }}</td>
+        <td>{{ c.authorName || ('#' + c.authorUserId) }}</td>
+        <td>{{ c.content }}</td>
+        <td>{{ c.likeCount }}</td>
+        <td><span [ngClass]="'badge ' + (c.status | lowercase)">{{ c.status }}</span></td>
+        <td class="actions">
+          <button class="btn ghost" *ngIf="c.status === 'PUBLISHED'" [disabled]="busy === c.id" (click)="cHide(c)">Ẩn</button>
+          <button class="btn" *ngIf="c.status === 'HIDDEN'" [disabled]="busy === c.id" (click)="cUnhide(c)">Hiện</button>
+          <button class="btn" *ngIf="c.status === 'REMOVED'" [disabled]="busy === c.id" (click)="cRestore(c)">Khôi phục</button>
+          <button class="btn danger" *ngIf="c.status !== 'REMOVED'" [disabled]="busy === c.id" (click)="cRemove(c)">Gỡ</button>
+        </td>
+      </tr>
+      <tr *ngIf="comments.content.length === 0"><td colspan="7" class="muted">Không có bình luận.</td></tr>
+    </tbody>
+  </table>
+  <div class="pager" *ngIf="comments">
+    <button class="btn ghost" (click)="cPrev()" [disabled]="cPage === 0">‹ Trước</button>
+    <span class="muted">Trang {{ comments.page + 1 }}/{{ comments.totalPages || 1 }} · {{ comments.totalElements }} bình luận</span>
+    <button class="btn ghost" (click)="cNext()" [disabled]="comments.page + 1 >= comments.totalPages">Sau ›</button>
+  </div>
+</ng-container>
+
+<!-- ============ THÀNH VIÊN ============ -->
+<ng-container *ngIf="tab === 'members'">
+  <div class="filters">
+    <input placeholder="Tìm handle / tên..." [(ngModel)]="mQ" (keyup.enter)="mFilter()" />
+    <button class="btn ghost" (click)="mFilter()">Tìm</button>
+  </div>
+  <p class="muted" *ngIf="loadingM">Đang tải...</p>
+  <table class="tbl" *ngIf="!loadingM && members">
+    <thead>
+      <tr><th>User</th><th>Handle</th><th>Tên</th><th>Email</th><th>Vai trò</th><th>Bài/Follower</th><th>Tài khoản</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of members.content">
+        <td>#{{ m.userId }}</td>
+        <td>{{ m.handle }}</td>
+        <td>{{ m.displayName || m.fullName }}</td>
+        <td>{{ m.email }}</td>
+        <td>{{ m.role }}</td>
+        <td>{{ m.postsCount }} / {{ m.followersCount }}</td>
+        <td><span [ngClass]="'badge ' + (m.accountStatus | lowercase)">{{ m.accountStatus }}</span></td>
+        <td class="actions">
+          <button class="btn danger" *ngIf="m.accountStatus !== 'LOCKED'" [disabled]="busy === m.userId" (click)="mLock(m)">Khoá</button>
+          <button class="btn" *ngIf="m.accountStatus === 'LOCKED'" [disabled]="busy === m.userId" (click)="mUnlock(m)">Mở khoá</button>
+        </td>
+      </tr>
+      <tr *ngIf="members.content.length === 0"><td colspan="8" class="muted">Không có thành viên.</td></tr>
+    </tbody>
+  </table>
+  <div class="pager" *ngIf="members">
+    <button class="btn ghost" (click)="mPrev()" [disabled]="mPage === 0">‹ Trước</button>
+    <span class="muted">Trang {{ members.page + 1 }}/{{ members.totalPages || 1 }} · {{ members.totalElements }} thành viên</span>
+    <button class="btn ghost" (click)="mNext()" [disabled]="members.page + 1 >= members.totalPages">Sau ›</button>
+  </div>
+</ng-container>
+
+<!-- ============ THỐNG KÊ ============ -->
+<ng-container *ngIf="tab === 'stats'">
+  <p class="muted" *ngIf="!stats">Đang tải...</p>
+  <div *ngIf="stats" class="statgrid">
+    <div class="statcard">
+      <div class="k">Bài viết</div>
+      <div class="statrow" *ngFor="let e of stats.postsByStatus | keyvalue">
+        <span><span [ngClass]="'badge ' + (e.key | lowercase)">{{ e.key }}</span></span><b>{{ e.value }}</b>
+      </div>
+    </div>
+    <div class="statcard">
+      <div class="k">Bình luận</div>
+      <div class="statrow" *ngFor="let e of stats.commentsByStatus | keyvalue">
+        <span><span [ngClass]="'badge ' + (e.key | lowercase)">{{ e.key }}</span></span><b>{{ e.value }}</b>
+      </div>
+    </div>
+    <div class="statcard">
+      <div class="k">Báo cáo</div>
+      <div class="statrow" *ngFor="let e of stats.reports | keyvalue">
+        <span><span [ngClass]="'badge ' + (e.key | lowercase)">{{ e.key }}</span></span><b>{{ e.value }}</b>
+      </div>
+    </div>
+    <div class="statcard">
+      <div class="k">Thành viên</div>
+      <div class="big">{{ stats.members }}</div>
+      <div class="k">Top hashtag</div>
+      <div class="statrow" *ngFor="let h of stats.topHashtags"><span>#{{ h.tag }}</span><b>{{ h.postCount }}</b></div>
+      <div class="statrow muted" *ngIf="stats.topHashtags.length === 0"><span>Chưa có</span></div>
+    </div>
+  </div>
+</ng-container>
