@@ -1,0 +1,136 @@
+<div class="page-head">
+  <h2>Khuyến mãi cá nhân hoá</h2>
+  <p class="muted">Tự động tặng voucher riêng cho từng khách: sinh nhật, khách quay lại, tri ân hạng, chào mừng khách mới.</p>
+</div>
+
+<div class="subtabs">
+  <button type="button" [class.active]="tab === 'campaigns'" (click)="switchTab('campaigns')">Chương trình</button>
+  <button type="button" [class.active]="tab === 'grants'" (click)="switchTab('grants')">Lịch sử phát</button>
+</div>
+
+<div class="err" *ngIf="err">{{ err }}</div>
+<p class="muted" *ngIf="loading">Đang tải…</p>
+
+<!-- ============ TAB: CHƯƠNG TRÌNH ============ -->
+<ng-container *ngIf="tab === 'campaigns'">
+  <div class="statgrid">
+    <div class="card statcard" *ngFor="let c of campaigns">
+      <div class="statrow">
+        <b>{{ c.typeName }}</b>
+        <span class="badge" [class.published]="c.enabled" [class.hidden]="!c.enabled">
+          {{ c.enabled ? 'Đang chạy' : 'Đã tắt' }}
+        </span>
+      </div>
+      <div class="muted" style="font-size:12.5px">{{ c.title }}</div>
+      <div style="margin:8px 0 4px"><b>{{ discountText(c) }}</b></div>
+      <div class="muted" style="font-size:12.5px">{{ conditionText(c) }}</div>
+      <div class="muted" style="font-size:12.5px">
+        Hạn dùng {{ c.validDays }} ngày
+        <span *ngIf="c.minOrderAmount"> · Đơn từ {{ money(c.minOrderAmount) }}</span>
+      </div>
+      <div class="muted" style="font-size:12.5px">Đã phát: <b>{{ c.grantedTotal }}</b> voucher</div>
+      <div class="form-actions" style="margin-top:10px">
+        <button type="button" class="btn ghost" (click)="toggle(c)">{{ c.enabled ? 'Tắt' : 'Bật' }}</button>
+        <button type="button" class="btn ghost" (click)="edit(c)">Sửa</button>
+        <button type="button" class="btn" (click)="run(c)">Chạy ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form sửa -->
+  <div class="card" *ngIf="editing" style="margin-top:16px">
+    <h3 style="margin-top:0">Sửa: {{ editing.typeName }}</h3>
+    <div class="form">
+      <label>Tiêu đề hiển thị cho khách
+        <input type="text" [(ngModel)]="editing.title" maxlength="120" />
+      </label>
+      <label>Mô tả
+        <input type="text" [(ngModel)]="editing.description" maxlength="200" />
+      </label>
+      <label>Kiểu giảm
+        <select [(ngModel)]="editing.discountType">
+          <option value="PERCENT">Theo % đơn hàng</option>
+          <option value="FIXED">Số tiền cố định</option>
+        </select>
+      </label>
+      <label>Mức giảm ({{ editing.discountType === 'PERCENT' ? '%' : 'đ' }})
+        <input type="number" [(ngModel)]="editing.discountValue" min="1" />
+      </label>
+      <label *ngIf="editing.discountType === 'PERCENT'">Giảm tối đa (đ)
+        <input type="number" [(ngModel)]="editing.maxDiscount" min="0" />
+      </label>
+      <label>Đơn tối thiểu (đ)
+        <input type="number" [(ngModel)]="editing.minOrderAmount" min="0" />
+      </label>
+      <label>Hạn dùng voucher (ngày)
+        <input type="number" [(ngModel)]="editing.validDays" min="1" />
+      </label>
+      <label *ngIf="editing.type === 'WIN_BACK' || editing.type === 'TIER_REWARD'">
+        {{ editing.type === 'WIN_BACK' ? 'Số ngày không đặt đơn' : 'Khoảng cách giữa 2 lần tặng (ngày)' }}
+        <input type="number" [(ngModel)]="editing.thresholdDays" min="1" />
+      </label>
+      <label *ngIf="editing.type === 'TIER_REWARD'">Hạng tối thiểu
+        <select [(ngModel)]="editing.minTier">
+          <option value="GOLD">Gold</option>
+          <option value="PLATINUM">Platinum</option>
+          <option value="DIAMOND">Diamond</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn" (click)="save()">Lưu</button>
+      <button type="button" class="btn ghost" (click)="cancelEdit()">Huỷ</button>
+    </div>
+  </div>
+</ng-container>
+
+<!-- ============ TAB: LỊCH SỬ PHÁT ============ -->
+<ng-container *ngIf="tab === 'grants'">
+  <div class="filters">
+    <select (change)="filterGrants($any($event.target).value)">
+      <option value="">Tất cả chương trình</option>
+      <option value="BIRTHDAY">Quà sinh nhật</option>
+      <option value="WIN_BACK">Khách quay lại</option>
+      <option value="TIER_REWARD">Tri ân hạng</option>
+      <option value="WELCOME">Chào mừng khách mới</option>
+    </select>
+    <span class="muted">{{ total }} lượt phát</span>
+  </div>
+
+  <div class="card">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Chương trình</th>
+          <th>Khách</th>
+          <th>Mã voucher</th>
+          <th>Lý do</th>
+          <th>Chu kỳ</th>
+          <th>Thời điểm</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let g of grants">
+          <td>{{ g.typeName }}</td>
+          <td>
+            <div>{{ g.userName || '—' }}</div>
+            <div class="muted" style="font-size:12px">{{ g.userEmail }}</div>
+          </td>
+          <td><code>{{ g.voucherCode }}</code></td>
+          <td class="muted">{{ g.note }}</td>
+          <td class="muted">{{ g.cycleKey }}</td>
+          <td class="muted">{{ g.grantedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+        <tr *ngIf="!grants.length && !loading">
+          <td colspan="6" class="muted">Chưa có lượt phát nào.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="form-actions" *ngIf="totalPages > 1">
+    <button type="button" class="btn ghost" [disabled]="page === 0" (click)="loadGrants(page - 1)">‹ Trước</button>
+    <span class="muted">Trang {{ page + 1 }} / {{ totalPages }}</span>
+    <button type="button" class="btn ghost" [disabled]="page + 1 >= totalPages" (click)="loadGrants(page + 1)">Sau ›</button>
+  </div>
+</ng-container>

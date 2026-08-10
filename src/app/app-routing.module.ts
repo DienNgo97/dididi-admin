@@ -11,6 +11,7 @@ import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
 import { ReviewAdminComponent } from './pages/reviews/review-admin.component';
 import { CommunityAdminComponent } from './pages/community/community-admin.component';
+import { PromoAdminComponent } from './pages/promo/promo-admin.component';
 import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
 import { VendorDashboardComponent } from './pages/vendor/vendor-dashboard.component';
 import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component';
@@ -43,6 +44,7 @@ const routes: Routes = [
   { path: 'vendors', component: VendorListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'reviews', component: ReviewAdminComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'community', component: CommunityAdminComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'promo', component: PromoAdminComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'companies', component: CompanyListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'companies/new', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'companies/:id/edit', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
