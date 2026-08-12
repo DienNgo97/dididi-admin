@@ -2,32 +2,46 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
+
+env:
+  # Angular CLI hoi "gui thong ke ẩn danh?" khi chay lan dau -> treo job. Tat han.
+  NG_CLI_ANALYTICS: 'false'
 
 jobs:
   build:
+    name: Build & test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 18
+      - name: Set up Node 18
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: npm
 
+      # npm ci cai dung theo package-lock.json (khong tu nang version)
+      # -> build tren CI giong het build tren may Jay.
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build (production)
+        run: npx ng build --configuration production
+
+      # Chrome da co san tren runner ubuntu-latest.
+      # --watch=false de chay 1 lan roi thoat, khong ngoi cho file thay doi.
+      - name: Unit tests
+        run: npx ng test --watch=false --browsers=ChromeHeadless --no-progress
 
       - name: Upload build output
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
-          if-no-files-found: ignore
+          name: dist-dididi-admin
+          path: dist/dididi-admin
+          if-no-files-found: error
+          retention-days: 7
