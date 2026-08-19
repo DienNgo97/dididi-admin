@@ -6,6 +6,8 @@
 <div class="err" *ngIf="error">{{ error }}</div>
 
 <div class="filters" style="flex-wrap:wrap;gap:12px">
+  <input type="search" [(ngModel)]="q" (ngModelChange)="onSearch()"
+         placeholder="🔍 Tìm tên / thành phố / địa chỉ..." style="padding:8px 12px;border:1px solid #cdd3dd;border-radius:8px;min-width:240px"/>
   <label class="muted">Hạng sao:</label>
   <select [ngModel]="star" (ngModelChange)="star = $event; onFilterChange()"
           style="padding:8px;border:1px solid #cdd3dd;border-radius:8px">

@@ -21,9 +21,10 @@ export class CommunityService {
   }
 
   // ---- Báo cáo ----
-  reports(page = 0, size = 20, status?: string): Observable<PagedResponse<AdminSocialReport>> {
+  reports(page = 0, size = 20, status?: string, q?: string): Observable<PagedResponse<AdminSocialReport>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
+    if (q) { params = params.set('q', q); }
     return this.http.get<ApiResponse<PagedResponse<AdminSocialReport>>>(`${this.base}/reports`, { params })
       .pipe(map((r) => r.data));
   }
@@ -60,11 +61,12 @@ export class CommunityService {
   }
 
   // ---- Bình luận ----
-  comments(page = 0, size = 20, status?: string, authorId?: number, postId?: number): Observable<PagedResponse<AdminSocialComment>> {
+  comments(page = 0, size = 20, status?: string, authorId?: number, postId?: number, q?: string): Observable<PagedResponse<AdminSocialComment>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
     if (authorId) { params = params.set('authorId', authorId); }
     if (postId) { params = params.set('postId', postId); }
+    if (q) { params = params.set('q', q); }
     return this.http.get<ApiResponse<PagedResponse<AdminSocialComment>>>(`${this.base}/comments`, { params })
       .pipe(map((r) => r.data));
   }

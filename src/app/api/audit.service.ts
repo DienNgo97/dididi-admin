@@ -11,9 +11,10 @@ export class AuditService {
   private base = `${API_BASE}/api/admin/v1/audit-logs`;
   constructor(private http: HttpClient) {}
 
-  list(page = 0, size = 30, action?: string): Observable<PagedResponse<AuditLog>> {
+  list(page = 0, size = 30, action?: string, q?: string): Observable<PagedResponse<AuditLog>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (action) { params = params.set('action', action); }
+    if (q) { params = params.set('q', q); }
     return this.http
       .get<ApiResponse<PagedResponse<AuditLog>>>(this.base, { params })
       .pipe(map((r) => r.data));

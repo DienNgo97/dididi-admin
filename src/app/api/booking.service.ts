@@ -11,12 +11,20 @@ export class BookingService {
   private base = `${API_BASE}/api/admin/v1/bookings`;
   constructor(private http: HttpClient) {}
 
-  list(page = 0, size = 20, status?: string, cancelStatus?: string): Observable<PagedResponse<AdminBooking>> {
+  list(page = 0, size = 20, status?: string, cancelStatus?: string, q?: string): Observable<PagedResponse<AdminBooking>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
     if (cancelStatus) { params = params.set('cancelStatus', cancelStatus); }
+    if (q) { params = params.set('q', q); }
     return this.http
       .get<ApiResponse<PagedResponse<AdminBooking>>>(this.base, { params })
+      .pipe(map((r) => r.data));
+  }
+
+  /** QA TC-C-13: chi tiet don (backend GET /{id} co san, truoc day chua ai goi). */
+  get(id: number): Observable<AdminBooking> {
+    return this.http
+      .get<ApiResponse<AdminBooking>>(`${this.base}/${id}`)
       .pipe(map((r) => r.data));
   }
 

@@ -17,6 +17,8 @@
     <select [ngModel]="rStatus" (ngModelChange)="rStatus = $event; rFilter()">
       <option *ngFor="let s of reportStatuses" [value]="s">{{ s || 'Tất cả' }}</option>
     </select>
+    <input placeholder="Tìm ghi chú / lý do / loại đối tượng..." [(ngModel)]="rQ" (keyup.enter)="rFilter()" />
+    <button class="btn ghost" (click)="rFilter()">Tìm</button>
   </div>
   <p class="muted" *ngIf="loadingR">Đang tải...</p>
   <table class="tbl" *ngIf="!loadingR && reports">
@@ -97,6 +99,8 @@
     <select [ngModel]="cStatus" (ngModelChange)="cStatus = $event; cFilter()">
       <option *ngFor="let s of contentStatuses" [value]="s">{{ s || 'Tất cả' }}</option>
     </select>
+    <input placeholder="Tìm theo nội dung bình luận..." [(ngModel)]="cQ" (keyup.enter)="cFilter()" />
+    <button class="btn ghost" (click)="cFilter()">Tìm</button>
   </div>
   <p class="muted" *ngIf="loadingC">Đang tải...</p>
   <table class="tbl" *ngIf="!loadingC && comments">

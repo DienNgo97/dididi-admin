@@ -18,7 +18,9 @@ export class ApprovalListComponent implements OnInit {
   activeTab: ApprovalTab = 'PENDING';
 
   items: ApprovalRequest[] = [];
+  filtered: ApprovalRequest[] = [];
   pageItems: ApprovalRequest[] = [];
+  q = '';               // thanh tìm kiếm (mã đơn / tiêu đề / công ty / người đặt, không dấu)
   loading = false;
   error = '';
   msg = '';
@@ -48,17 +50,29 @@ export class ApprovalListComponent implements OnInit {
     });
   }
 
+  /** Bỏ dấu tiếng Việt để tìm không dấu (gõ "cong ty" ra "Công ty"). */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
+  onSearch(): void { this.page = 0; this.recompute(); }
+
   private recompute(): void {
-    const maxPage = Math.max(0, Math.ceil(this.items.length / this.size) - 1);
+    const q = this.strip(this.q);
+    this.filtered = !q ? this.items : this.items.filter((r) =>
+      this.strip(r.bookingCode).includes(q) || this.strip(r.bookingTitle).includes(q)
+      || this.strip(r.companyName).includes(q) || this.strip(r.requestedByEmail).includes(q));
+    const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) {
       this.page = maxPage;
     }
     const start = this.page * this.size;
-    this.pageItems = this.items.slice(start, start + this.size);
+    this.pageItems = this.filtered.slice(start, start + this.size);
   }
 
   get totalPages(): number {
-    return Math.max(1, Math.ceil(this.items.length / this.size));
+    return Math.max(1, Math.ceil(this.filtered.length / this.size));
   }
 
   prev(): void {

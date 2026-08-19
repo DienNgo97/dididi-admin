@@ -41,6 +41,10 @@
 
 <div class="card" style="margin-top:16px">
   <h3 style="margin-top:0">Báo cáo hoa hồng (đơn khách sạn đã xác nhận)</h3>
+  <div class="filters">
+    <input type="search" [(ngModel)]="reportQ" (ngModelChange)="onReportSearch()"
+           placeholder="🔍 Tìm theo tên vendor..." style="padding:8px 12px;border:1px solid #cdd3dd;border-radius:8px;min-width:260px"/>
+  </div>
   <table class="tbl" *ngIf="report">
     <thead><tr><th>Vendor</th><th>Số đơn</th><th>Doanh thu</th><th>Tỷ lệ</th><th>Hoa hồng</th><th>Net trả vendor</th></tr></thead>
     <tbody>

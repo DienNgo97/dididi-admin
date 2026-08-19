@@ -14,6 +14,8 @@ export class BookingListComponent implements OnInit, OnDestroy {
   page = 0;
   size = 20;
   status = '';
+  q = '';
+  private qTimer?: ReturnType<typeof setTimeout>;
   tab: 'all' | 'cancel' = 'all';
   pendingCancelCount = 0;
   loading = false;
@@ -36,8 +38,8 @@ export class BookingListComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = '';
     const req = this.tab === 'cancel'
-      ? this.bookingService.list(this.page, this.size, undefined, 'REQUESTED')
-      : this.bookingService.list(this.page, this.size, this.status || undefined);
+      ? this.bookingService.list(this.page, this.size, undefined, 'REQUESTED', this.q || undefined)
+      : this.bookingService.list(this.page, this.size, this.status || undefined, undefined, this.q || undefined);
     req.pipe(takeUntil(this.destroy$)).subscribe({
       next: (d) => { this.data = d; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được danh sách'; this.loading = false; }
@@ -59,6 +61,12 @@ export class BookingListComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange(): void { this.page = 0; this.load(); }
+
+  /** Thanh tìm kiếm: debounce 350ms rồi tải lại từ trang 0 (tìm phía server). */
+  onSearch(): void {
+    clearTimeout(this.qTimer);
+    this.qTimer = setTimeout(() => { this.page = 0; this.load(); }, 350);
+  }
   prev(): void { if (this.page > 0) { this.page--; this.load(); } }
   next(): void { if (this.data && this.page + 1 < this.data.totalPages) { this.page++; this.load(); } }
 
