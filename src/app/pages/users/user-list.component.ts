@@ -13,6 +13,8 @@ export class UserListComponent implements OnInit {
   size = 20;
   role = '';
   status = '';
+  q = '';
+  private qTimer?: ReturnType<typeof setTimeout>;
   loading = false;
   error = '';
   roles = ['', 'CUSTOMER', 'VENDOR', 'ADMIN', 'SUPER_ADMIN'];
@@ -30,13 +32,19 @@ export class UserListComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
-    this.userService.list(this.page, this.size, this.role || undefined, this.status || undefined).subscribe({
+    this.userService.list(this.page, this.size, this.role || undefined, this.status || undefined, this.q || undefined).subscribe({
       next: (d) => { this.data = d; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được danh sách'; this.loading = false; }
     });
   }
 
   onFilterChange(): void { this.page = 0; this.load(); }
+
+  /** Thanh tìm kiếm: debounce 350ms rồi tải lại từ trang 0 (tìm phía server). */
+  onSearch(): void {
+    clearTimeout(this.qTimer);
+    this.qTimer = setTimeout(() => { this.page = 0; this.load(); }, 350);
+  }
   prev(): void { if (this.page > 0) { this.page--; this.load(); } }
   next(): void { if (this.data && this.page + 1 < this.data.totalPages) { this.page++; this.load(); } }
 

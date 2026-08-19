@@ -43,8 +43,22 @@ export class VendorListComponent implements OnInit {
     });
   }
 
+  q = '';               // thanh tìm kiếm (email / họ tên / tên KS, không dấu)
+
+  /** Bỏ dấu tiếng Việt để tìm không dấu (go "ha noi" ra "Hà Nội"). */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
+  onSearch(): void { this.page = 0; this.recompute(); }
+
   private recompute(): void {
-    this.filtered = this.allVendors.filter((v) => !this.status || v.status === this.status);
+    const q = this.strip(this.q);
+    this.filtered = this.allVendors.filter((v) =>
+      (!this.status || v.status === this.status)
+      && (!q || this.strip(v.email).includes(q) || this.strip(v.fullName).includes(q)
+          || this.strip(v.hotelName).includes(q)));
     const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) {
       this.page = maxPage;

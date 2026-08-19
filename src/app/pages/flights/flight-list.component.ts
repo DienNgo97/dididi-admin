@@ -10,6 +10,8 @@ export class FlightListComponent implements OnInit {
   data?: PagedResponse<AdminFlight>;
   page = 0;
   size = 20;
+  q = '';
+  private qTimer?: ReturnType<typeof setTimeout>;
   loading = false;
   error = '';
 
@@ -20,10 +22,16 @@ export class FlightListComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
-    this.flightService.list(this.page, this.size).subscribe({
+    this.flightService.list(this.page, this.size, this.q || undefined).subscribe({
       next: (d) => { this.data = d; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Không tải được danh sách'; this.loading = false; }
     });
+  }
+
+  /** Thanh tìm kiếm: debounce 350ms rồi tải lại từ trang 0 (tìm phía server). */
+  onSearch(): void {
+    clearTimeout(this.qTimer);
+    this.qTimer = setTimeout(() => { this.page = 0; this.load(); }, 350);
   }
 
   prev(): void { if (this.page > 0) { this.page--; this.load(); } }

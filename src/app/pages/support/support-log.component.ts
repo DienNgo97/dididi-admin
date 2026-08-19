@@ -31,6 +31,8 @@ export class SupportLogComponent implements OnInit, OnDestroy {
   error = '';
   page = 0;
   size = 20;
+  q = '';               // thanh tìm kiếm (mã hội thoại / mã khách)
+  filtered: SupportConversation[] = [];
 
   selected?: SupportConversation;
   messages: SupportChatMessage[] = [];
@@ -58,14 +60,21 @@ export class SupportLogComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSearch(): void { this.page = 0; this.recompute(); }
+
   private recompute(): void {
-    const maxPage = Math.max(0, Math.ceil(this.all.length / this.size) - 1);
+    const q = this.q.trim().toLowerCase();
+    this.filtered = !q ? this.all : this.all.filter((c) =>
+      (c.conversationId || '').toLowerCase().includes(q)
+      || String(c.userId ?? '').includes(q)
+      || ('#' + (c.userId ?? '')).includes(q));
+    const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) { this.page = maxPage; }
     const start = this.page * this.size;
-    this.pageItems = this.all.slice(start, start + this.size);
+    this.pageItems = this.filtered.slice(start, start + this.size);
   }
 
-  get totalPages(): number { return Math.max(1, Math.ceil(this.all.length / this.size)); }
+  get totalPages(): number { return Math.max(1, Math.ceil(this.filtered.length / this.size)); }
   prev(): void { if (this.page > 0) { this.page--; this.recompute(); } }
   next(): void { if (this.page + 1 < this.totalPages) { this.page++; this.recompute(); } }
 

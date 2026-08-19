@@ -80,13 +80,24 @@ export class VoucherListComponent implements OnInit {
     }
   }
 
+  q = '';               // thanh tìm kiếm (mã / mô tả, không dấu)
+
+  /** Bỏ dấu tiếng Việt để tìm không dấu (go "ha noi" ra "Hà Nội"). */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
+  onSearch(): void { this.page = 0; this.recompute(); }
+
   private recompute(): void {
+    const q = this.strip(this.q);
     this.filtered = this.allVouchers.filter((v) => {
       const pt = this.isPoint(v);
       if (this.typeFilter === 'point' && !pt) { return false; }
       if (this.typeFilter === 'dididi' && pt) { return false; }
       if (this.statusFilter && this.statusKey(v) !== this.statusFilter) { return false; }
-      return true;
+      return !q || this.strip(v.code).includes(q) || this.strip(v.description).includes(q);
     });
     const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) {

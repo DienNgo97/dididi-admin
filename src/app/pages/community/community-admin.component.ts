@@ -25,6 +25,7 @@ export class CommunityAdminComponent implements OnInit {
   reports?: PagedResponse<AdminSocialReport>;
   rPage = 0;
   rStatus = 'OPEN';
+  rQ = '';
   reportStatuses = ['', 'OPEN', 'REVIEWED', 'ACTIONED', 'DISMISSED'];
   loadingR = false;
 
@@ -40,6 +41,7 @@ export class CommunityAdminComponent implements OnInit {
   comments?: PagedResponse<AdminSocialComment>;
   cPage = 0;
   cStatus = '';
+  cQ = '';
   loadingC = false;
 
   // Thành viên
@@ -84,7 +86,7 @@ export class CommunityAdminComponent implements OnInit {
   // ================= BÁO CÁO =================
   loadReports(): void {
     this.loadingR = true; this.error = '';
-    this.svc.reports(this.rPage, this.size, this.rStatus || undefined).subscribe({
+    this.svc.reports(this.rPage, this.size, this.rStatus || undefined, this.rQ || undefined).subscribe({
       next: (d) => { this.reports = d; this.loadingR = false; },
       error: (e) => { this.error = this.msg(e); this.loadingR = false; }
     });
@@ -121,7 +123,7 @@ export class CommunityAdminComponent implements OnInit {
   // ================= BÌNH LUẬN =================
   loadComments(): void {
     this.loadingC = true; this.error = '';
-    this.svc.comments(this.cPage, this.size, this.cStatus || undefined).subscribe({
+    this.svc.comments(this.cPage, this.size, this.cStatus || undefined, undefined, undefined, this.cQ || undefined).subscribe({
       next: (d) => { this.comments = d; this.loadingC = false; },
       error: (e) => { this.error = this.msg(e); this.loadingC = false; }
     });

@@ -16,6 +16,11 @@
 
 <p class="muted" *ngIf="loading">Đang tải...</p>
 
+<div class="filters">
+  <input type="search" [(ngModel)]="q" (ngModelChange)="onSearch()"
+         placeholder="🔍 Tìm mã hội thoại / mã khách..." style="padding:8px 12px;border:1px solid #cdd3dd;border-radius:8px;min-width:260px"/>
+</div>
+
 <table class="tbl" *ngIf="!loading">
   <thead>
     <tr><th>Hội thoại</th><th>Số tin</th><th>Khách</th><th>Bắt đầu</th><th>Cập nhật</th><th>Tổng đài</th><th></th></tr>

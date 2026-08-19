@@ -15,6 +15,7 @@ export class HotelListComponent implements OnInit {
   error = '';
 
   // Bộ lọc
+  q = '';               // thanh tìm kiếm (tên / thành phố / địa chỉ, không dấu)
   star = '';            // '' = tất cả, hoặc '1'..'5'
   city = '';            // '' = tất cả
   cities: string[] = []; // danh sách thành phố (sinh từ dữ liệu)
@@ -49,11 +50,21 @@ export class HotelListComponent implements OnInit {
     });
   }
 
+
+  /** Bỏ dấu tiếng Việt để tìm không dấu (go "ha noi" ra "Hà Nội"). */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
   private recompute(): void {
+    const q = this.strip(this.q);
     this.filtered = this.allHotels.filter((h) => {
       const okStar = !this.star || String(h.starRating) === this.star;
       const okCity = !this.city || h.city === this.city;
-      return okStar && okCity;
+      const okQ = !q || this.strip(h.name).includes(q)
+        || this.strip(h.city).includes(q) || this.strip(h.address).includes(q);
+      return okStar && okCity && okQ;
     });
     const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) {
@@ -66,6 +77,8 @@ export class HotelListComponent implements OnInit {
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.filtered.length / this.size));
   }
+
+  onSearch(): void { this.page = 0; this.recompute(); }
 
   onFilterChange(): void {
     this.page = 0;

@@ -11,10 +11,11 @@ export class UserService {
   private base = `${API_BASE}/api/admin/v1/users`;
   constructor(private http: HttpClient) {}
 
-  list(page = 0, size = 20, role?: string, status?: string): Observable<PagedResponse<AdminUser>> {
+  list(page = 0, size = 20, role?: string, status?: string, q?: string): Observable<PagedResponse<AdminUser>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (role) { params = params.set('role', role); }
     if (status) { params = params.set('status', status); }
+    if (q) { params = params.set('q', q); }
     return this.http
       .get<ApiResponse<PagedResponse<AdminUser>>>(this.base, { params })
       .pipe(map((r) => r.data));

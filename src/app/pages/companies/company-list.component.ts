@@ -39,11 +39,23 @@ export class CompanyListComponent implements OnInit {
     });
   }
 
+  q = '';               // thanh tìm kiếm (tên / mã / email liên hệ, không dấu)
+
+  /** Bỏ dấu tiếng Việt để tìm không dấu (go "ha noi" ra "Hà Nội"). */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
+  onSearch(): void { this.page = 0; this.recompute(); }
+
   private recompute(): void {
+    const q = this.strip(this.q);
     this.filtered = this.allCompanies.filter((c) => {
-      if (this.status === 'active') { return c.active; }
-      if (this.status === 'inactive') { return !c.active; }
-      return true;
+      if (this.status === 'active' && !c.active) { return false; }
+      if (this.status === 'inactive' && c.active) { return false; }
+      return !q || this.strip(c.name).includes(q) || this.strip(c.code).includes(q)
+        || this.strip(c.contactEmail).includes(q);
     });
     const maxPage = Math.max(0, Math.ceil(this.filtered.length / this.size) - 1);
     if (this.page > maxPage) {

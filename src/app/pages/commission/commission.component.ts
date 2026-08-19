@@ -18,6 +18,7 @@ export class CommissionComponent implements OnInit, OnDestroy {
   reportRows: CommissionReportRow[] = [];   // dòng của trang hiện tại (báo cáo hoa hồng)
   reportPage = 0;
   readonly reportPageSize = 20;
+  reportQ = '';           // thanh tìm kiếm bảng báo cáo (tên vendor, không dấu)
   vendorOptions: AdminUser[] = [];
   selVendorId: number | null = null;
   selVendorPercent: number | null = null;
@@ -56,13 +57,27 @@ export class CommissionComponent implements OnInit, OnDestroy {
   }
 
   // ---- Phân trang client-side cho bảng "Báo cáo hoa hồng" (20 vendor/trang) ----
+  /** Bỏ dấu tiếng Việt để tìm không dấu. */
+  private strip(s?: string | null): string {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+
+  private reportFiltered(): CommissionReportRow[] {
+    const q = this.strip(this.reportQ);
+    const rows = this.report?.rows ?? [];
+    return !q ? rows : rows.filter((r) => this.strip(r.vendorName).includes(q));
+  }
+
+  onReportSearch(): void { this.reportPage = 0; this.applyReportPage(); }
+
   get reportTotalPages(): number {
-    const n = this.report?.rows.length ?? 0;
+    const n = this.reportFiltered().length;
     return Math.max(1, Math.ceil(n / this.reportPageSize));
   }
 
   private applyReportPage(): void {
-    const rows = this.report?.rows ?? [];
+    const rows = this.reportFiltered();
     const maxPage = this.reportTotalPages - 1;
     if (this.reportPage > maxPage) { this.reportPage = maxPage; }
     const start = this.reportPage * this.reportPageSize;

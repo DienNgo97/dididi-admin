@@ -54,6 +54,8 @@
 </div>
 
 <div class="filters" style="flex-wrap:wrap;gap:12px">
+  <input type="search" [(ngModel)]="q" (ngModelChange)="onSearch()"
+         placeholder="🔍 Tìm mã / mô tả voucher..." style="padding:8px 12px;border:1px solid #cdd3dd;border-radius:8px;min-width:240px"/>
   <label class="muted">Loại:</label>
   <select [ngModel]="typeFilter" (ngModelChange)="typeFilter = $event; onFilterChange()">
     <option value="">Tất cả</option>

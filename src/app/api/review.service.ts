@@ -13,9 +13,10 @@ export class ReviewService {
   constructor(private http: HttpClient) {}
 
   // ---- Admin kiểm duyệt ----
-  adminList(page = 0, size = 20, status?: string): Observable<PagedResponse<AdminReview>> {
+  adminList(page = 0, size = 20, status?: string, q?: string): Observable<PagedResponse<AdminReview>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
+    if (q) { params = params.set('q', q); }
     return this.http
       .get<ApiResponse<PagedResponse<AdminReview>>>(this.adminBase, { params })
       .pipe(map((r) => r.data));
