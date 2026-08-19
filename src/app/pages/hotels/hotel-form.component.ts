@@ -29,14 +29,24 @@ export class HotelFormComponent implements OnInit {
   save(): void {
     this.error = '';
     this.saving = true;
+    // QA TC-C-12: model được load từ API PUBLIC nên amenities là object {name, label...},
+    // còn API admin (PUT) chờ mảng CHUỖI mã enum -> chuẩn hoá trước khi gửi, nếu không
+    // Jackson vỡ ở HotelUpsertRequest.amenities và trả 500 "Something went wrong".
+    const m: any = { ...this.model };
+    if (Array.isArray(m.amenities)) {
+      m.amenities = m.amenities.map((a: any) => (typeof a === 'string' ? a : (a?.code ?? a?.name))).filter(Boolean);
+    }
+    if (Array.isArray(m.tags)) {
+      m.tags = m.tags.map((t: any) => (typeof t === 'string' ? t : (t?.code ?? t?.name))).filter(Boolean);
+    }
     const done = {
       next: () => { this.saving = false; this.router.navigate(['/hotels']); },
       error: (err: any) => { this.saving = false; this.error = err?.error?.message || 'Lưu thất bại'; }
     };
     if (this.id) {
-      this.hotelService.update(this.id, this.model).subscribe(done);
+      this.hotelService.update(this.id, m).subscribe(done);
     } else {
-      this.hotelService.create(this.model).subscribe(done);
+      this.hotelService.create(m).subscribe(done);
     }
   }
 
