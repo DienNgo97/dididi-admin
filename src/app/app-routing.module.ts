@@ -6,6 +6,7 @@ import { HotelListComponent } from './pages/hotels/hotel-list.component';
 import { HotelFormComponent } from './pages/hotels/hotel-form.component';
 import { FlightListComponent } from './pages/flights/flight-list.component';
 import { BookingListComponent } from './pages/bookings/booking-list.component';
+import { BookingDetailComponent } from './pages/bookings/booking-detail.component';
 import { UserListComponent } from './pages/users/user-list.component';
 import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
@@ -40,6 +41,7 @@ const routes: Routes = [
   { path: 'hotels/:id/edit', component: HotelFormComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'flights', component: FlightListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'bookings', component: BookingListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'bookings/:id', component: BookingDetailComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'users', component: UserListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'vendors', component: VendorListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'reviews', component: ReviewAdminComponent, canActivate: [roleGuard(...ADMIN)] },

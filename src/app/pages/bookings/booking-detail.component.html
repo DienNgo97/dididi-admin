@@ -1,0 +1,39 @@
+<div class="page-head">
+  <h1>Chi tiết đơn <span *ngIf="b">· {{ b.publicCode }}</span></h1>
+  <a class="btn ghost" routerLink="/bookings">‹ Danh sách đơn</a>
+</div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<div class="card" *ngIf="b" style="max-width:640px">
+  <table class="tbl">
+    <tbody>
+      <tr><th style="width:180px">Mã đơn</th><td>{{ b.publicCode }}</td></tr>
+      <tr><th>ID nội bộ</th><td>{{ b.id }}</td></tr>
+      <tr><th>User ID</th><td>{{ b.userId }}</td></tr>
+      <tr><th>Loại</th><td>{{ b.type }}</td></tr>
+      <tr><th>Tiêu đề</th><td>{{ b.title }}</td></tr>
+      <tr><th>Số tiền</th><td>{{ b.amount | number }} {{ b.currency }}</td></tr>
+      <tr><th>Số lượng</th><td>{{ b.quantity }}</td></tr>
+      <tr>
+        <th>Trạng thái</th>
+        <td><span [ngClass]="'badge ' + (b.status | lowercase)">{{ b.status }}</span></td>
+      </tr>
+      <tr *ngIf="b.checkIn"><th>Nhận phòng</th><td>{{ b.checkIn }}</td></tr>
+      <tr *ngIf="b.checkOut"><th>Trả phòng</th><td>{{ b.checkOut }}</td></tr>
+      <tr *ngIf="b.travelDate"><th>Ngày khởi hành</th><td>{{ b.travelDate | date:'dd/MM/yyyy HH:mm' }}</td></tr>
+      <tr *ngIf="b.providerConfirmation"><th>Mã xác nhận NCC</th><td>{{ b.providerConfirmation }}</td></tr>
+      <tr *ngIf="b.createdAt"><th>Ngày tạo</th><td>{{ b.createdAt | date:'dd/MM/yyyy HH:mm' }}</td></tr>
+      <tr *ngIf="b.cancelStatus && b.cancelStatus !== 'NONE'">
+        <th>Yêu cầu huỷ</th>
+        <td><span [ngClass]="'badge ' + (b.cancelStatus | lowercase)">{{ b.cancelStatus }}</span></td>
+      </tr>
+      <tr *ngIf="b.cancelReason"><th>Lý do huỷ</th><td>{{ b.cancelReason }}</td></tr>
+      <tr *ngIf="b.cancelAdminNote"><th>Ghi chú admin</th><td>{{ b.cancelAdminNote }}</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:12px;margin-top:10px">
+    Thao tác hoàn tiền / huỷ / duyệt yêu cầu huỷ thực hiện ở trang danh sách đơn.
+  </p>
+</div>

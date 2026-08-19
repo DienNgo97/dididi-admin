@@ -11,6 +11,7 @@ import { HotelListComponent } from './pages/hotels/hotel-list.component';
 import { HotelFormComponent } from './pages/hotels/hotel-form.component';
 import { FlightListComponent } from './pages/flights/flight-list.component';
 import { BookingListComponent } from './pages/bookings/booking-list.component';
+import { BookingDetailComponent } from './pages/bookings/booking-detail.component';
 import { UserListComponent } from './pages/users/user-list.component';
 import { VendorHotelComponent } from './pages/vendor/vendor-hotel.component';
 import { VendorListComponent } from './pages/vendors/vendor-list.component';
@@ -44,6 +45,7 @@ import { AuthInterceptor } from './core/auth.interceptor';
     HotelFormComponent,
     FlightListComponent,
     BookingListComponent,
+    BookingDetailComponent,
     UserListComponent,
     VendorHotelComponent,
     VendorListComponent,
