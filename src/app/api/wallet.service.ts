@@ -52,6 +52,20 @@ export class WalletService {
   }
 
   // ---- Admin ----
+  /** Admin ghi nhận đã chuyển khoản cho vendor (chi tay ngoài hệ thống). */
+  adminMarkPaid(id: number, transactionRef: string): Observable<Payout> {
+    return this.http
+      .post<ApiResponse<Payout>>(`${this.adminBase}/${id}/paid`, { transactionRef })
+      .pipe(map((r) => r.data));
+  }
+
+  /** Admin từ chối — tiền nhả về số dư khả dụng của vendor. */
+  adminMarkFailed(id: number, reason: string): Observable<Payout> {
+    return this.http
+      .post<ApiResponse<Payout>>(`${this.adminBase}/${id}/failed`, { reason })
+      .pipe(map((r) => r.data));
+  }
+
   adminList(page = 0, size = 20, status?: string): Observable<PagedResponse<Payout>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (status) { params = params.set('status', status); }
