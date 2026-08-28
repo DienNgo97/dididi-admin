@@ -43,7 +43,9 @@
         <button class="btn" *ngIf="b.status === 'CONFIRMED'" [disabled]="refunding === b.id" (click)="refund(b)">
           {{ refunding === b.id ? 'Đang hoàn...' : 'Hoàn tiền' }}
         </button>
-        <button class="btn danger" *ngIf="b.status !== 'CANCELLED'" (click)="cancel(b)">Huỷ (admin)</button>
+        <!-- P0-2: đơn ĐÃ THANH TOÁN phải đi đường Hoàn tiền (hoàn tiền khách + đảo điểm + trả ngân sách);
+             huỷ trắng chỉ dành cho đơn chưa thanh toán. -->
+        <button class="btn danger" *ngIf="b.status === 'PENDING_PAYMENT'" (click)="cancel(b)">Huỷ (admin)</button>
       </td>
     </tr>
     <tr *ngIf="data.content.length === 0"><td colspan="8" class="muted">{{ tab === 'cancel' ? 'Không có yêu cầu huỷ nào.' : 'Không có đơn.' }}</td></tr>

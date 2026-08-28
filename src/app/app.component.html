@@ -80,7 +80,11 @@
 
       <ng-container *ngIf="auth.role === 'SUPER_ADMIN'">
         <div class="nav-sec">Hệ thống</div>
-        <a routerLink="/audit" routerLinkActive="active">
+        <a routerLink="/ops-alerts" routerLinkActive="active">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 2.7 19.5h18.6z"/><path d="M12 9.5v4.2M12 16.8h.01"/></svg>
+        <span>Cảnh báo</span>
+      </a>
+      <a routerLink="/audit" routerLinkActive="active">
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v3h3"/><path d="M12 8v4.5l3 1.8"/></svg>
           <span>Audit</span>
         </a>

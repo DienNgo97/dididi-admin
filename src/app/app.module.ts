@@ -36,6 +36,7 @@ import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component'
 import { VendorWalletComponent } from './pages/vendor/vendor-wallet.component';
 import { PayoutListComponent } from './pages/payouts/payout-list.component';
 import { SettlementComponent } from './pages/settlements/settlement.component';
+import { OpsAlertComponent } from './pages/ops/ops-alert.component';
 import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
@@ -73,6 +74,7 @@ import { AuthInterceptor } from './core/auth.interceptor';
     VendorWalletComponent,
     PayoutListComponent,
     SettlementComponent,
+    OpsAlertComponent,
     VendorInventoryReportComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],

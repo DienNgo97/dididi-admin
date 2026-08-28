@@ -21,6 +21,12 @@ export class PayoutListComponent implements OnInit {
   error = '';
   statuses = ['', 'REQUESTED', 'PROCESSING', 'PAID', 'FAILED', 'CANCELLED'];
 
+  // Chi tiền thủ công (ở production mock ngân hàng tắt — đây là đường duy nhất chốt yêu cầu)
+  settlingId = 0;
+  mode: 'paid' | 'failed' = 'paid';
+  inputValue = '';
+  busy = 0;
+
   constructor(private wallet: WalletService) {}
 
   ngOnInit(): void { this.load(); }
@@ -47,6 +53,24 @@ export class PayoutListComponent implements OnInit {
       (p.vendorEmail || '').toLowerCase().includes(q)
       || (p.vendorName || '').toLowerCase().includes(q)
       || (p.transactionRef || '').toLowerCase().includes(q));
+  }
+
+  openSettle(p: Payout, mode: 'paid' | 'failed'): void {
+    this.settlingId = p.id;
+    this.mode = mode;
+    this.inputValue = '';
+  }
+
+  confirmSettle(p: Payout): void {
+    if (this.busy) { return; }
+    this.busy = p.id;
+    const call = this.mode === 'paid'
+      ? this.wallet.adminMarkPaid(p.id, this.inputValue)
+      : this.wallet.adminMarkFailed(p.id, this.inputValue);
+    call.subscribe({
+      next: () => { this.busy = 0; this.settlingId = 0; this.load(); },
+      error: (e) => { this.busy = 0; window.appAlert(e?.error?.message || 'Thao tác thất bại'); }
+    });
   }
 
   vnd(n?: number | null): string { return n == null ? '' : Number(n).toLocaleString('vi-VN'); }

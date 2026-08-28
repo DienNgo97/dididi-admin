@@ -19,6 +19,7 @@ import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component'
 import { VendorWalletComponent } from './pages/vendor/vendor-wallet.component';
 import { PayoutListComponent } from './pages/payouts/payout-list.component';
 import { SettlementComponent } from './pages/settlements/settlement.component';
+import { OpsAlertComponent } from './pages/ops/ops-alert.component';
 import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuditLogComponent } from './pages/audit/audit-log.component';
 import { CommissionComponent } from './pages/commission/commission.component';
@@ -57,6 +58,7 @@ const routes: Routes = [
   { path: 'vouchers', component: VoucherListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'payouts', component: PayoutListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'settlements', component: SettlementComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'ops-alerts', component: OpsAlertComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'reports', component: AdminReportComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'support-log', component: SupportLogComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'audit', component: AuditLogComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
