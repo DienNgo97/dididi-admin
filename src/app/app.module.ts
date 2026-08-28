@@ -33,6 +33,9 @@ import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 import { BarChartComponent } from './pages/shared/bar-chart.component';
 import { VendorDashboardComponent } from './pages/vendor/vendor-dashboard.component';
 import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component';
+import { VendorWalletComponent } from './pages/vendor/vendor-wallet.component';
+import { PayoutListComponent } from './pages/payouts/payout-list.component';
+import { SettlementComponent } from './pages/settlements/settlement.component';
 import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuthInterceptor } from './core/auth.interceptor';
 
@@ -67,6 +70,9 @@ import { AuthInterceptor } from './core/auth.interceptor';
     BarChartComponent,
     VendorDashboardComponent,
     VendorRevenueComponent,
+    VendorWalletComponent,
+    PayoutListComponent,
+    SettlementComponent,
     VendorInventoryReportComponent
   ],
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],

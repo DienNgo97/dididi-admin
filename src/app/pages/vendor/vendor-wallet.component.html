@@ -1,0 +1,125 @@
+<div class="page-head"><h1>Ví của tôi</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin:10px 0">{{ msg }}</div>
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<!-- ===== Số dư 3 bucket ===== -->
+<div *ngIf="summary" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+  <div class="card" style="flex:1;min-width:200px;padding:16px">
+    <div class="muted" style="font-size:13px">Khả dụng rút</div>
+    <div style="font-size:26px;font-weight:800;color:#1a6b52">{{ vnd(summary.available) }} đ</div>
+    <div class="muted" style="font-size:12px">Doanh thu đã qua 3 ngày sau trả phòng</div>
+  </div>
+  <div class="card" style="flex:1;min-width:200px;padding:16px">
+    <div class="muted" style="font-size:13px">Đang chờ</div>
+    <div style="font-size:26px;font-weight:800">{{ vnd(summary.pending) }} đ</div>
+    <div class="muted" style="font-size:12px">Chưa tới hạn (khách còn quyền khiếu nại)</div>
+  </div>
+  <div class="card" style="flex:1;min-width:200px;padding:16px">
+    <div class="muted" style="font-size:13px">Bị giữ</div>
+    <div style="font-size:26px;font-weight:800;color:#b26a00">{{ vnd(summary.held + summary.payoutHolding) }} đ</div>
+    <div class="muted" style="font-size:12px">Khiếu nại đang xử lý + yêu cầu rút đang chạy</div>
+  </div>
+</div>
+
+<!-- ===== Tài khoản nhận tiền + form rút ===== -->
+<div *ngIf="summary" style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:18px">
+  <div class="card" style="flex:1;min-width:300px;padding:16px">
+    <h3 style="margin:0 0 10px">Tài khoản nhận tiền</h3>
+    <ng-container *ngIf="summary.hasBankAccount && !showBankForm">
+      <div><b>{{ summary.bankName }}</b> · {{ summary.bankAccountMasked }}</div>
+      <div class="muted">{{ summary.bankAccountHolder }}</div>
+      <button class="btn ghost" style="margin-top:10px" (click)="openBankForm()">Sửa</button>
+    </ng-container>
+    <ng-container *ngIf="!summary.hasBankAccount && !showBankForm">
+      <p class="muted">Chưa có tài khoản nhận tiền — cần nhập trước khi rút.</p>
+      <button class="btn" (click)="openBankForm()">+ Thêm tài khoản</button>
+    </ng-container>
+    <div *ngIf="showBankForm" style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <input [(ngModel)]="bankName" placeholder="Tên ngân hàng (VD: Vietcombank)"/>
+      <input [(ngModel)]="accountNo" placeholder="Số tài khoản (chỉ chữ số)" inputmode="numeric"/>
+      <input [(ngModel)]="holder" placeholder="Chủ tài khoản (VD: NGO TRUNG DIEN)"/>
+      <div style="display:flex;gap:8px">
+        <button class="btn" [disabled]="savingBank" (click)="saveBank()">{{ savingBank ? 'Đang lưu...' : 'Lưu' }}</button>
+        <button class="btn ghost" (click)="showBankForm = false">Huỷ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="flex:1;min-width:300px;padding:16px">
+    <h3 style="margin:0 0 10px">Rút tiền</h3>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input type="number" [(ngModel)]="amount" [min]="summary.minPayout"
+             placeholder="Số tiền (đ)" style="flex:1;min-width:160px"/>
+      <button class="btn" [disabled]="requesting || !summary.hasBankAccount" (click)="request()">
+        {{ requesting ? 'Đang gửi...' : 'Rút tiền' }}
+      </button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">
+      Tối thiểu {{ vnd(summary.minPayout) }}đ · tối đa {{ vnd(summary.available) }}đ (khả dụng).
+      Tiền được chuyển tới tài khoản ở khung bên cạnh.
+    </p>
+  </div>
+</div>
+
+<!-- ===== Yêu cầu rút ===== -->
+<h3 style="margin:18px 0 8px">Yêu cầu rút tiền</h3>
+<table class="tbl" *ngIf="payouts">
+  <thead>
+    <tr><th>#</th><th>Số tiền</th><th>Tài khoản</th><th>Trạng thái</th><th>Mã GD / lý do</th><th>Tạo lúc</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of payouts.content">
+      <td>{{ p.id }}</td>
+      <td><b>{{ vnd(p.amount) }} đ</b></td>
+      <td>{{ p.bankName }} · {{ p.bankAccountMasked }}</td>
+      <td><span [ngClass]="'badge ' + (p.status | lowercase)">{{ statusLabel(p.status) }}</span></td>
+      <td>
+        <span *ngIf="p.transactionRef">{{ p.transactionRef }}</span>
+        <span class="muted" *ngIf="p.failReason">{{ p.failReason }}</span>
+      </td>
+      <td>{{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+      <td class="actions">
+        <button class="btn danger" *ngIf="p.status === 'REQUESTED'"
+                [disabled]="busyId === p.id" (click)="cancel(p)">Huỷ</button>
+      </td>
+    </tr>
+    <tr *ngIf="payouts.content.length === 0"><td colspan="7" class="muted">Chưa có yêu cầu rút nào.</td></tr>
+  </tbody>
+</table>
+<div class="pager" *ngIf="payouts && payouts.totalPages > 1">
+  <button class="btn ghost" (click)="loadPayouts(payoutPage - 1)" [disabled]="payoutPage === 0">‹ Trước</button>
+  <span class="muted">Trang {{ payouts.page + 1 }}/{{ payouts.totalPages }}</span>
+  <button class="btn ghost" (click)="loadPayouts(payoutPage + 1)" [disabled]="payouts.page + 1 >= payouts.totalPages">Sau ›</button>
+</div>
+
+<!-- ===== Sổ cái ===== -->
+<h3 style="margin:22px 0 8px">Lịch sử biến động (sổ cái)</h3>
+<table class="tbl" *ngIf="ledger">
+  <thead>
+    <tr><th>#</th><th>Loại</th><th>Đơn</th><th>Doanh thu gộp</th><th>Hoa hồng</th><th>Ròng vào ví</th><th>Khả dụng từ</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let l of ledger.content">
+      <td>{{ l.id }}</td>
+      <td>{{ typeLabel(l.type) }}</td>
+      <td>{{ l.bookingCode || '—' }}</td>
+      <td>{{ l.gross != null ? vnd(l.gross) + ' đ' : '—' }}</td>
+      <td>
+        <span *ngIf="l.commissionAmount != null">
+          {{ vnd(l.commissionAmount) }} đ <small class="muted" *ngIf="l.commissionRate != null">({{ (l.commissionRate * 100).toFixed(0) }}%)</small>
+        </span>
+        <span *ngIf="l.commissionAmount == null">—</span>
+      </td>
+      <td [style.color]="l.netAmount < 0 ? '#c62828' : '#1a6b52'"><b>{{ l.netAmount > 0 ? '+' : '' }}{{ vnd(l.netAmount) }} đ</b></td>
+      <td>{{ l.availableFrom }}</td>
+    </tr>
+    <tr *ngIf="ledger.content.length === 0"><td colspan="7" class="muted">Chưa có biến động nào.</td></tr>
+  </tbody>
+</table>
+<div class="pager" *ngIf="ledger && ledger.totalPages > 1">
+  <button class="btn ghost" (click)="loadLedger(ledgerPage - 1)" [disabled]="ledgerPage === 0">‹ Trước</button>
+  <span class="muted">Trang {{ ledger.page + 1 }}/{{ ledger.totalPages }} · {{ ledger.totalElements }} bút toán</span>
+  <button class="btn ghost" (click)="loadLedger(ledgerPage + 1)" [disabled]="ledger.page + 1 >= ledger.totalPages">Sau ›</button>
+</div>

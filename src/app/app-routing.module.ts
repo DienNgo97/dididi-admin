@@ -16,6 +16,9 @@ import { PromoAdminComponent } from './pages/promo/promo-admin.component';
 import { VendorReviewComponent } from './pages/vendor/vendor-review.component';
 import { VendorDashboardComponent } from './pages/vendor/vendor-dashboard.component';
 import { VendorRevenueComponent } from './pages/vendor/vendor-revenue.component';
+import { VendorWalletComponent } from './pages/vendor/vendor-wallet.component';
+import { PayoutListComponent } from './pages/payouts/payout-list.component';
+import { SettlementComponent } from './pages/settlements/settlement.component';
 import { VendorInventoryReportComponent } from './pages/vendor/vendor-inventory-report.component';
 import { AuditLogComponent } from './pages/audit/audit-log.component';
 import { CommissionComponent } from './pages/commission/commission.component';
@@ -52,6 +55,8 @@ const routes: Routes = [
   { path: 'companies/:id/edit', component: CompanyFormComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'approvals', component: ApprovalListComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'vouchers', component: VoucherListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'payouts', component: PayoutListComponent, canActivate: [roleGuard(...ADMIN)] },
+  { path: 'settlements', component: SettlementComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'reports', component: AdminReportComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'support-log', component: SupportLogComponent, canActivate: [roleGuard(...ADMIN)] },
   { path: 'audit', component: AuditLogComponent, canActivate: [roleGuard('SUPER_ADMIN')] },
@@ -62,6 +67,7 @@ const routes: Routes = [
   { path: 'vendor', component: VendorHotelComponent, canActivate: [roleGuard('VENDOR')] },
   { path: 'vendor/dashboard', component: VendorDashboardComponent, canActivate: [roleGuard('VENDOR')] },
   { path: 'vendor/revenue', component: VendorRevenueComponent, canActivate: [roleGuard('VENDOR')] },
+  { path: 'vendor/wallet', component: VendorWalletComponent, canActivate: [roleGuard('VENDOR')] },
   { path: 'vendor/inventory', component: VendorInventoryReportComponent, canActivate: [roleGuard('VENDOR')] },
   { path: 'vendor/reviews', component: VendorReviewComponent, canActivate: [roleGuard('VENDOR')] },
 
