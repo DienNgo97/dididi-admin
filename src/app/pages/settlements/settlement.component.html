@@ -1,0 +1,92 @@
+<div class="page-head"><h1>Đối soát đối tác</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin:10px 0">{{ msg }}</div>
+
+<div class="filters">
+  <label class="muted">Kỳ (tháng):</label>
+  <input type="month" [(ngModel)]="period" (ngModelChange)="load()"
+         style="padding:8px 12px;border:1px solid #cdd3dd;border-radius:8px"/>
+  <span class="muted" *ngIf="data && !data.overview.periodClosable" style="font-size:13px">
+    ⏳ Kỳ này chưa chốt được (phải qua hết tháng + 3 ngày khiếu nại)
+  </span>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<!-- ===== Phương trình dòng tiền: không lỗ hổng doanh thu ===== -->
+<div *ngIf="data" class="card" style="padding:16px;margin-bottom:18px"
+     [style.border]="data.overview.balanced ? '1px solid #cfe3da' : '2px solid #c62828'">
+  <h3 style="margin:0 0 10px">
+    Phương trình dòng tiền kỳ {{ data.overview.periodYm }}
+    <span *ngIf="data.overview.balanced" style="color:#1a6b52;font-size:14px">✓ CÂN — mọi đồng doanh thu có chủ</span>
+    <span *ngIf="!data.overview.balanced" style="color:#c62828;font-size:14px">✗ LỆCH — có doanh thu chưa quy được về kênh nào!</span>
+  </h3>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <div style="min-width:150px"><div class="muted" style="font-size:12px">Tổng doanh thu ({{ data.overview.totalCount }} đơn)</div>
+      <b style="font-size:18px">{{ vnd(data.overview.totalGross) }} đ</b></div>
+    <div style="min-width:30px;align-self:center;font-size:18px">=</div>
+    <div style="min-width:140px"><div class="muted" style="font-size:12px">Ví vendor (DIRECT)</div>
+      <b>{{ vnd(data.overview.vendorWalletGross) }} đ</b></div>
+    <div style="align-self:center">+</div>
+    <div style="min-width:140px"><div class="muted" style="font-size:12px">Công nợ đối tác API</div>
+      <b>{{ vnd(data.overview.partnerGross) }} đ</b></div>
+    <div style="align-self:center">+</div>
+    <div style="min-width:140px"><div class="muted" style="font-size:12px">Tự doanh nền tảng</div>
+      <b>{{ vnd(data.overview.platformGross) }} đ</b></div>
+    <div *ngIf="data.overview.orphanCount > 0" style="align-self:center">+</div>
+    <div *ngIf="data.overview.orphanCount > 0" style="min-width:140px;color:#c62828">
+      <div style="font-size:12px">⚠ Đơn mồ côi ({{ data.overview.orphanCount }})</div>
+      <b>{{ vnd(data.overview.orphanGross) }} đ</b></div>
+  </div>
+</div>
+
+<!-- ===== Công nợ đối tác ===== -->
+<h3 style="margin:0 0 8px">Công nợ phải trả đối tác</h3>
+<table class="tbl" *ngIf="data">
+  <thead>
+    <tr><th>Đối tác</th><th>Số đơn</th><th>Doanh thu gộp</th><th>Hoa hồng nền tảng</th><th>Phải trả</th><th>Trạng thái</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of partnerRows">
+      <td><b>{{ r.partnerName }}</b><div class="muted" style="font-size:12px">{{ r.partnerCode }}</div></td>
+      <td>{{ r.bookingCount }}</td>
+      <td>{{ vnd(r.gross) }} đ</td>
+      <td>{{ vnd(r.commissionAmount) }} đ <small class="muted" *ngIf="r.commissionRate != null">({{ (r.commissionRate * 100).toFixed(0) }}%)</small></td>
+      <td><b style="color:#1a6b52">{{ vnd(r.netPayable) }} đ</b></td>
+      <td>
+        <span [ngClass]="'badge ' + r.status.toLowerCase()">{{ statusLabel(r.status) }}</span>
+        <div class="muted" *ngIf="r.paymentRef" style="font-size:12px">UNC: {{ r.paymentRef }}</div>
+      </td>
+      <td class="actions">
+        <button class="btn" *ngIf="r.closable" [disabled]="busy === r.partnerCode" (click)="close(r)">Chốt kỳ</button>
+        <ng-container *ngIf="r.status === 'CLOSED'">
+          <button class="btn" *ngIf="payingFor !== r.partnerCode" (click)="openPaid(r)">Đã thanh toán</button>
+          <span *ngIf="payingFor === r.partnerCode" style="display:inline-flex;gap:6px">
+            <input [(ngModel)]="paymentRef" placeholder="Mã UNC" style="width:130px;padding:6px;border:1px solid #cdd3dd;border-radius:8px"/>
+            <button class="btn" [disabled]="busy === r.partnerCode" (click)="confirmPaid(r)">Lưu</button>
+            <button class="btn ghost" (click)="payingFor = ''">Huỷ</button>
+          </span>
+        </ng-container>
+        <button class="btn ghost" *ngIf="r.bookingCount > 0" (click)="exportCsv(r)">CSV</button>
+      </td>
+    </tr>
+    <tr *ngIf="partnerRows.length === 0"><td colspan="7" class="muted">Không có công nợ đối tác trong kỳ.</td></tr>
+  </tbody>
+</table>
+
+<!-- ===== Các kênh còn lại (thông tin — không phải trả) ===== -->
+<h3 style="margin:20px 0 8px">Các kênh còn lại của kỳ</h3>
+<table class="tbl" *ngIf="data">
+  <thead><tr><th>Kênh</th><th>Số đơn</th><th>Doanh thu gộp</th><th>Ghi chú</th></tr></thead>
+  <tbody>
+    <tr *ngFor="let r of infoRows">
+      <td><b>{{ r.partnerName }}</b></td>
+      <td>{{ r.bookingCount }}</td>
+      <td>{{ vnd(r.gross) }} đ</td>
+      <td class="muted">
+        {{ r.kind === 'WALLET' ? 'Đã ghi sổ cái ví từng vendor — vendor tự rút qua "Ví của tôi"' : 'Doanh thu thuộc nền tảng, không phát sinh công nợ' }}
+      </td>
+    </tr>
+  </tbody>
+</table>
