@@ -39,6 +39,14 @@
       <div style="font-size:12px">⚠ Đơn mồ côi ({{ data.overview.orphanCount }})</div>
       <b>{{ vnd(data.overview.orphanGross) }} đ</b></div>
   </div>
+
+  <!-- Đơn không có mốc ngày dịch vụ: vô hình với MỌI kỳ nên phải cảnh báo riêng, không cộng vào kỳ nào -->
+  <div *ngIf="data.overview.undatableCount > 0"
+       style="margin-top:12px;padding:10px 12px;border-radius:8px;background:#fdecea;color:#c62828">
+    ⚠ <b>{{ data.overview.undatableCount }} đơn</b> đã xác nhận nhưng thiếu ngày trả phòng / ngày bay
+    ({{ vnd(data.overview.undatableGross) }} đ) — không thuộc kỳ nào nên không đối tác nào được trả.
+    Cần vá dữ liệu cho các đơn này rồi tính lại kỳ.
+  </div>
 </div>
 
 <!-- ===== Công nợ đối tác ===== -->

@@ -24,6 +24,9 @@ export interface SettlementOverview {
   orphanGross: number;
   orphanCount: number;
   balanced: boolean;
+  /** Đơn CONFIRMED không có mốc ngày dịch vụ -> không thuộc kỳ nào (P1-2). */
+  undatableCount: number;
+  undatableGross: number;
   periodClosable: boolean;
 }
 
