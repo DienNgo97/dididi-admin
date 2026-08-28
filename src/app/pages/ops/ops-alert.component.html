@@ -1,0 +1,67 @@
+<div class="page-head"><h1>Cảnh báo vận hành</h1></div>
+
+<div class="err" *ngIf="error">{{ error }}</div>
+<div *ngIf="msg" style="color:#2e7d32;margin:10px 0">{{ msg }}</div>
+
+<p class="muted" style="margin-top:0">
+  Hệ thống tự canh hai điều: <b>khách trả tiền thì đơn phải sống</b>, và <b>vé đã bán thì ghế phải là của khách</b>.
+  Lệch thì tự cứu; cứu không được sẽ hiện ở đây để người thật xử lý.
+</p>
+
+<div class="filters">
+  <label class="muted">Trạng thái:</label>
+  <select [ngModel]="status" (ngModelChange)="status = $event; onFilterChange()">
+    <option value="">Tất cả</option>
+    <option value="OPEN">Chưa xử lý</option>
+    <option value="RESOLVED">Đã xử lý</option>
+  </select>
+</div>
+
+<p class="muted" *ngIf="loading">Đang tải...</p>
+
+<table class="tbl" *ngIf="!loading && data">
+  <thead>
+    <tr><th>#</th><th>Loại</th><th>Đơn</th><th>Chi tiết</th><th>Nên làm gì</th><th>Trạng thái</th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of data.content">
+      <td>{{ a.id }}</td>
+      <td>
+        <b>{{ typeLabel(a.type) }}</b>
+        <div class="muted" style="font-size:12px">{{ a.createdAt | date:'dd/MM HH:mm' }}</div>
+      </td>
+      <td>
+        <a *ngIf="a.bookingId" [routerLink]="['/bookings', a.bookingId]">{{ a.bookingCode }}</a>
+        <span *ngIf="!a.bookingId" class="muted">—</span>
+      </td>
+      <td style="max-width:340px">{{ a.detail }}</td>
+      <td style="max-width:280px" class="muted">{{ a.suggestedAction }}</td>
+      <td>
+        <span [ngClass]="'badge ' + (a.status === 'OPEN' ? 'requested' : 'paid')">
+          {{ a.status === 'OPEN' ? 'Chưa xử lý' : 'Đã xử lý' }}
+        </span>
+        <div class="muted" *ngIf="a.resolveNote" style="font-size:12px">{{ a.resolveNote }}</div>
+      </td>
+      <td class="actions">
+        <ng-container *ngIf="a.status === 'OPEN'">
+          <button class="btn" *ngIf="resolvingId !== a.id" (click)="openResolve(a)">Đã xử lý</button>
+          <span *ngIf="resolvingId === a.id" style="display:inline-flex;gap:6px;align-items:center">
+            <input [(ngModel)]="note" placeholder="Đã làm gì?"
+                   style="width:170px;padding:6px;border:1px solid #cdd3dd;border-radius:8px"/>
+            <button class="btn" [disabled]="busy === a.id" (click)="confirmResolve(a)">Lưu</button>
+            <button class="btn ghost" (click)="resolvingId = 0">Huỷ</button>
+          </span>
+        </ng-container>
+      </td>
+    </tr>
+    <tr *ngIf="data.content.length === 0">
+      <td colspan="7" class="muted">Không có cảnh báo nào — hệ thống đang chạy đúng.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="pager" *ngIf="data && data.totalPages > 1">
+  <button class="btn ghost" (click)="prev()" [disabled]="page === 0">‹ Trước</button>
+  <span class="muted">Trang {{ data.page + 1 }}/{{ data.totalPages }} · {{ data.totalElements }} cảnh báo</span>
+  <button class="btn ghost" (click)="next()" [disabled]="data.page + 1 >= data.totalPages">Sau ›</button>
+</div>
