@@ -62,6 +62,8 @@ export interface AdminUser {
   status: string;
   vendorId?: number;
   createdAt?: string;
+  /** Khách chỉ nhập được một lần; admin sửa hộ khi gõ nhầm (thao tác có ghi audit). */
+  birthDate?: string;
 }
 
 export interface AdminFlight {

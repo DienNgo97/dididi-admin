@@ -35,6 +35,18 @@ export class UserService {
       .pipe(map((r) => r.data));
   }
 
+  /**
+   * Sửa ngày sinh hộ khách — khách chỉ nhập được một lần nên đây là đường thoát duy nhất khi gõ
+   * nhầm. Để trống = xoá, khách được nhập lại. Backend ghi audit "từ gì sang gì".
+   */
+  changeBirthDate(id: number, birthDate: string | null): Observable<AdminUser> {
+    let params = new HttpParams();
+    if (birthDate) { params = params.set('birthDate', birthDate); }
+    return this.http
+      .patch<ApiResponse<AdminUser>>(`${this.base}/${id}/birth-date`, {}, { params })
+      .pipe(map((r) => r.data));
+  }
+
   create(req: CreateAdminRequest): Observable<AdminUser> {
     return this.http.post<ApiResponse<AdminUser>>(this.base, req).pipe(map((r) => r.data));
   }

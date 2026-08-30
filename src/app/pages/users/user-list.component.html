@@ -40,7 +40,7 @@
 
 <table class="tbl" *ngIf="!loading && data">
   <thead>
-    <tr><th>ID</th><th>Email</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th></tr>
+    <tr><th>ID</th><th>Email</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th>Ngày sinh</th></tr>
   </thead>
   <tbody>
     <tr *ngFor="let u of data.content">
@@ -57,8 +57,21 @@
           <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
         </select>
       </td>
+      <!-- Khách chỉ nhập ngày sinh một lần; đây là đường sửa hộ khi khách gõ nhầm (có ghi audit). -->
+      <td>
+        <ng-container *ngIf="editingBirthId !== u.id">
+          <span>{{ u.birthDate ? (u.birthDate | date:'dd/MM/yyyy') : '—' }}</span>
+          <button class="btn ghost" style="margin-left:6px" (click)="openBirth(u)">Sửa</button>
+        </ng-container>
+        <span *ngIf="editingBirthId === u.id" style="display:inline-flex;gap:6px;align-items:center">
+          <input type="date" [(ngModel)]="birthValue"
+                 style="padding:6px;border:1px solid #cdd3dd;border-radius:8px"/>
+          <button class="btn" [disabled]="birthBusy === u.id" (click)="saveBirth(u)">Lưu</button>
+          <button class="btn ghost" (click)="editingBirthId = 0">Huỷ</button>
+        </span>
+      </td>
     </tr>
-    <tr *ngIf="data.content.length === 0"><td colspan="5" class="muted">Không có user.</td></tr>
+    <tr *ngIf="data.content.length === 0"><td colspan="6" class="muted">Không có user.</td></tr>
   </tbody>
 </table>
 
