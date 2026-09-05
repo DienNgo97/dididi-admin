@@ -20,6 +20,11 @@ export class UserListComponent implements OnInit {
   roles = ['', 'CUSTOMER', 'VENDOR', 'ADMIN', 'SUPER_ADMIN'];
   statuses = ['ACTIVE', 'INACTIVE', 'LOCKED'];
 
+  /** Sửa ngày sinh hộ khách (khách chỉ nhập được một lần) — id đang mở ô sửa. */
+  editingBirthId = 0;
+  birthValue = '';
+  birthBusy = 0;
+
   showCreate = false;
   creating = false;
   createMsg = '';
@@ -63,6 +68,28 @@ export class UserListComponent implements OnInit {
     this.userService.changeRole(u.id, role).subscribe({
       next: (updated) => { u.role = updated.role; },
       error: (err) => { u.role = prev; window.appAlert(err?.error?.message || 'Đổi vai trò thất bại'); }
+    });
+  }
+
+  openBirth(u: AdminUser): void {
+    this.editingBirthId = u.id;
+    this.birthValue = u.birthDate ? u.birthDate.substring(0, 10) : '';
+  }
+
+  /** Để trống = xoá ngày sinh, khách được nhập lại một lần nữa. Backend ghi audit cũ -> mới. */
+  saveBirth(u: AdminUser): void {
+    if (this.birthBusy) { return; }
+    this.birthBusy = u.id;
+    this.userService.changeBirthDate(u.id, this.birthValue || null).subscribe({
+      next: (updated) => {
+        u.birthDate = updated.birthDate;
+        this.birthBusy = 0;
+        this.editingBirthId = 0;
+      },
+      error: (err) => {
+        this.birthBusy = 0;
+        window.appAlert(err?.error?.message || 'Sửa ngày sinh thất bại');
+      }
     });
   }
 
